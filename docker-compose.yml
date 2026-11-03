@@ -1,0 +1,21 @@
+# Base de données de développement. Lancer avec : docker compose up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kaarpro-postgres
+    environment:
+      POSTGRES_DB: kaarpro
+      POSTGRES_USER: kaarpro
+      POSTGRES_PASSWORD: kaarpro-dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - kaarpro-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kaarpro -d kaarpro"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  kaarpro-pgdata:

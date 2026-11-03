@@ -1,0 +1,6 @@
+# Fichiers propres à chaque poste
+.php/
+.idea/
+.vscode/
+*.log
+.claude/
