@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\DemandeResource;
 use App\Models\Contrat;
 use App\Models\Demande;
+use App\Notifications\Alerte;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
@@ -57,21 +58,27 @@ class DemandeController extends Controller
                 ]);
 
                 // Les autres demandes en attente sur une période qui chevauche ne peuvent plus aboutir
-                $vehicule->demandes()
+                $concurrentes = $vehicule->demandes()
                     ->whereKeyNot($demande->id)
                     ->where('type', TypeDemande::Location)
                     ->where('statut', StatutDemande::EnAttente)
                     ->where('date_debut', '<=', $fin)
                     ->where('date_fin', '>=', $debut)
-                    ->update([
+                    ->with('client')
+                    ->get();
+                foreach ($concurrentes as $concurrente) {
+                    $concurrente->update([
                         'statut' => StatutDemande::Refusee,
                         'motif_refus' => 'Le véhicule a été réservé sur cette période.',
                         'repondue_le' => now(),
                     ]);
+                    $concurrente->client->notify(new Alerte('demande', 'Demande refusée',
+                        "Le {$vehicule->marque} {$vehicule->modele} a été réservé sur la période demandée.", '/demandes'));
+                }
             } else {
                 $dejaVendu = $vehicule->demandes()
                     ->where('type', TypeDemande::Achat)
-                    ->where('statut', StatutDemande::Acceptee)
+                    ->whereIn('statut', [StatutDemande::Acceptee, StatutDemande::Payee])
                     ->exists();
                 if ($dejaVendu) {
                     throw ValidationException::withMessages(['demande' => "Une demande d'achat a déjà été acceptée pour ce véhicule."]);
@@ -82,7 +89,12 @@ class DemandeController extends Controller
             $this->genererContrat($demande);
         });
 
-        return new DemandeResource($demande->refresh()->load(self::RELATIONS));
+        $demande->refresh()->load(self::RELATIONS);
+        $demande->client->notify(new Alerte('demande', 'Demande acceptée',
+            "{$demande->partenaire->nom_commercial} a accepté votre demande pour le {$demande->vehicule->marque} {$demande->vehicule->modele}. Signez le contrat pour passer au paiement.",
+            "/contrats/{$demande->contrat->id}"));
+
+        return new DemandeResource($demande);
     }
 
     public function refuser(Request $request, Demande $demande): DemandeResource
@@ -98,7 +110,12 @@ class DemandeController extends Controller
             'repondue_le' => now(),
         ]);
 
-        return new DemandeResource($demande->load(self::RELATIONS));
+        $demande->load(self::RELATIONS);
+        $demande->client->notify(new Alerte('demande', 'Demande refusée',
+            "{$demande->partenaire->nom_commercial} a refusé votre demande pour le {$demande->vehicule->marque} {$demande->vehicule->modele} : {$donnees['motif']}",
+            '/demandes'));
+
+        return new DemandeResource($demande);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\ConversationResource;
 use App\Models\Conversation;
 use App\Models\Vehicule;
+use App\Notifications\Alerte;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -63,8 +64,20 @@ class MessagerieController extends Controller
         abort_unless($conversation->concerne($request->user()), 404);
 
         $donnees = $request->validate(['contenu' => ['required', 'string', 'max:2000']]);
-        $conversation->messages()->create(['auteur_id' => $request->user()->id, 'contenu' => trim($donnees['contenu'])]);
+        $auteur = $request->user();
+        $precedent = $conversation->messages()->latest('id')->first();
+        $conversation->messages()->create(['auteur_id' => $auteur->id, 'contenu' => trim($donnees['contenu'])]);
         $conversation->touch();
+
+        // Une seule notification tant que le destinataire n'a pas lu les messages précédents de l'auteur
+        if (! $precedent || $precedent->auteur_id !== $auteur->id || $precedent->lu_le !== null) {
+            $estClient = $conversation->client_id === $auteur->id;
+            $destinataire = $estClient ? $conversation->partenaire->user : $conversation->client;
+            $expediteur = $estClient ? $auteur->nom : $conversation->partenaire->nom_commercial;
+            $destinataire->notify(new Alerte('message', 'Nouveau message',
+                "{$expediteur} vous a écrit à propos du {$conversation->vehicule->marque} {$conversation->vehicule->modele}.",
+                "/messages/{$conversation->id}"));
+        }
 
         return new ConversationResource($conversation->load([...self::RELATIONS, 'messages']));
     }

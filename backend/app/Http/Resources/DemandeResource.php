@@ -47,6 +47,15 @@ class DemandeResource extends JsonResource
                 'numero' => $this->contrat->numero,
                 'signe_client_le' => $this->contrat->signe_client_le?->toIso8601String(),
             ] : null),
+            'paiement' => $this->whenLoaded('paiementReussi', fn () => $this->paiementReussi ? [
+                'reference' => $this->paiementReussi->reference,
+                'operateur' => $this->paiementReussi->operateur->libelle(),
+                'montant_total' => $this->paiementReussi->montant_total,
+                'paye_le' => $this->paiementReussi->paye_le?->toIso8601String(),
+                'statut_caution' => $this->paiementReussi->statut_caution,
+                'caution_retenue' => $this->paiementReussi->caution_retenue,
+                'motif_retenue' => $this->paiementReussi->motif_retenue,
+            ] : null),
             'cree_le' => $this->created_at?->toIso8601String(),
             'repondue_le' => $this->repondue_le?->toIso8601String(),
         ];

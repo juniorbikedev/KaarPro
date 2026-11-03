@@ -17,6 +17,7 @@ return [
     'required_with' => 'Le champ :attribute est obligatoire quand :values est rempli.',
     'confirmed' => 'La confirmation du champ :attribute ne correspond pas.',
     'email' => 'Le champ :attribute doit être une adresse e-mail valide.',
+    'regex' => 'Le format du champ :attribute est invalide.',
     'required_if' => 'Le champ :attribute est obligatoire quand :other vaut :value.',
     'enum' => 'La valeur choisie pour :attribute est invalide.',
     'file' => 'Le champ :attribute doit être un fichier.',
@@ -37,6 +38,11 @@ return [
     'required' => 'Le champ :attribute est obligatoire.',
     'string' => 'Le champ :attribute doit être une chaîne de caractères.',
     'unique' => 'Cette valeur de :attribute est déjà utilisée.',
+
+    'custom' => [
+        'telephone' => ['regex' => 'Saisissez un numéro sénégalais valide (ex. : 77 123 45 67).'],
+        'motif_retenue' => ['required_unless' => 'Indiquez le motif de la retenue.'],
+    ],
 
     'attributes' => [
         'nom' => 'nom',
@@ -70,5 +76,9 @@ return [
         'message' => 'message',
         'contenu' => 'message',
         'accepte' => 'acceptation du contrat',
+        'operateur' => 'opérateur',
+        'resultat' => 'résultat',
+        'caution_retenue' => 'montant retenu',
+        'motif_retenue' => 'motif de la retenue',
     ],
 ];

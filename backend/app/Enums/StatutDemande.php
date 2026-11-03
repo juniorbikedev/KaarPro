@@ -8,4 +8,5 @@ enum StatutDemande: string
     case Acceptee = 'acceptee';
     case Refusee = 'refusee';
     case Annulee = 'annulee';
+    case Payee = 'payee';
 }

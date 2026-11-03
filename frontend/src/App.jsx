@@ -12,10 +12,13 @@ import MesDemandes from './pages/MesDemandes'
 import Messagerie from './pages/Messagerie'
 import CalendrierVehicule from './pages/partenaire/CalendrierVehicule'
 import DemandesRecues from './pages/partenaire/DemandesRecues'
+import Encaissements from './pages/partenaire/Encaissements'
 import FormVehicule from './pages/partenaire/FormVehicule'
 import MesVehicules from './pages/partenaire/MesVehicules'
 import { ChoixInscription, InscriptionClient, InscriptionPartenaire } from './pages/Inscription'
 import Profil from './pages/Profil'
+import SimulateurPaiement from './pages/SimulateurPaiement'
+import Paiements from './pages/admin/Paiements'
 import Partenaires from './pages/admin/Partenaires'
 import Utilisateurs from './pages/admin/Utilisateurs'
 
@@ -39,6 +42,9 @@ export default function App() {
             <Route path="partenaire/vehicules/:id/calendrier" element={<Protege roles={['vendeur']}><CalendrierVehicule /></Protege>} />
             <Route path="partenaire/demandes" element={<Protege roles={['vendeur']}><DemandesRecues /></Protege>} />
             <Route path="demandes" element={<Protege roles={['client']}><MesDemandes /></Protege>} />
+            <Route path="paiement/:reference" element={<Protege roles={['client']}><SimulateurPaiement /></Protege>} />
+            <Route path="partenaire/paiements" element={<Protege roles={['vendeur']}><Encaissements /></Protege>} />
+            <Route path="admin/paiements" element={<Protege roles={['admin']}><Paiements /></Protege>} />
             <Route path="contrats/:id" element={<Protege roles={['client', 'vendeur', 'admin']}><Contrat /></Protege>} />
             <Route path="messages" element={<Protege roles={['client', 'vendeur']}><Messagerie /></Protege>} />
             <Route path="messages/:id" element={<Protege roles={['client', 'vendeur']}><Messagerie /></Protege>} />

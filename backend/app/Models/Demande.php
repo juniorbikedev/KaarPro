@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use App\Enums\StatutDemande;
+use App\Enums\StatutPaiement;
 use App\Enums\TypeDemande;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Demande extends Model
@@ -51,6 +53,16 @@ class Demande extends Model
     public function contrat(): HasOne
     {
         return $this->hasOne(Contrat::class);
+    }
+
+    public function paiements(): HasMany
+    {
+        return $this->hasMany(Paiement::class);
+    }
+
+    public function paiementReussi(): HasOne
+    {
+        return $this->hasOne(Paiement::class)->where('statut', StatutPaiement::Reussi);
     }
 
     public function estEnAttente(): bool

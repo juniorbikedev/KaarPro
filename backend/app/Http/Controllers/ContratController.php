@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\Role;
 use App\Http\Resources\ContratResource;
 use App\Models\Contrat;
+use App\Notifications\Alerte;
 use Illuminate\Http\Request;
 
 /** Cas « Consulter et signer le contrat ». */
@@ -31,6 +32,10 @@ class ContratController extends Controller
 
         $request->validate(['accepte' => ['accepted']]);
         $contrat->update(['signe_client_le' => now()]);
+
+        $contrat->demande->partenaire->user->notify(new Alerte('contrat', 'Contrat signé',
+            "{$request->user()->nom} a signé le contrat {$contrat->numero}. Le paiement peut maintenant être effectué.",
+            "/contrats/{$contrat->id}"));
 
         return new ContratResource($contrat);
     }

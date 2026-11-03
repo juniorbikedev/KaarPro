@@ -7,6 +7,7 @@ use App\Enums\TypeDemande;
 use App\Http\Resources\DemandeResource;
 use App\Models\Demande;
 use App\Models\Vehicule;
+use App\Notifications\Alerte;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class DemandeController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $demandes = Demande::where('client_id', $request->user()->id)
-            ->with(['vehicule.photos', 'partenaire', 'contrat'])
+            ->with(['vehicule.photos', 'partenaire', 'contrat', 'paiementReussi'])
             ->latest()
             ->get();
 
@@ -80,6 +81,11 @@ class DemandeController extends Controller
         }
 
         $demande = $vehicule->demandes()->create($attributs);
+
+        $vehicule->partenaire->user->notify(new Alerte('demande',
+            $type === TypeDemande::Location ? 'Nouvelle demande de location' : "Nouvelle demande d'achat",
+            "{$request->user()->nom} s'intéresse à votre {$vehicule->marque} {$vehicule->modele}.",
+            '/partenaire/demandes'));
 
         return (new DemandeResource($demande->refresh()->load(['vehicule.photos', 'partenaire', 'contrat'])))
             ->response()

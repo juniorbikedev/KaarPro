@@ -36,6 +36,7 @@ export const STATUTS_DEMANDE = {
   acceptee: ['Acceptée', 'statut-valide'],
   refusee: ['Refusée', 'statut-refuse'],
   annulee: ['Annulée', 'statut-annule'],
+  payee: ['Payée', 'statut-valide'],
 }
 
 /** Nombre de jours d'une location, bornes comprises (du 10 au 12 = 3 jours). */
@@ -46,3 +47,7 @@ export function nbJours(debut, fin) {
 export function dateHeure(iso) {
   return new Date(iso).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 }
+
+export const OPERATEURS = { wave: 'Wave', orange_money: 'Orange Money' }
+
+export const STATUTS_CAUTION = { bloquee: 'Caution bloquée', restituee: 'Caution restituée' }

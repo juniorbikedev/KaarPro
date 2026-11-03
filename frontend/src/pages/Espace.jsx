@@ -36,6 +36,7 @@ function EspacePartenaire({ partenaire }) {
           <div className="actions">
             <Link to="/partenaire/vehicules" className="bouton">Gérer mes véhicules</Link>
             <Link to="/partenaire/demandes" className="bouton bouton-secondaire">Demandes reçues</Link>
+            <Link to="/partenaire/paiements" className="bouton bouton-discret">Encaissements</Link>
           </div>
         )}
         {partenaire.motif_refus && <p className="alerte alerte-erreur">Motif : {partenaire.motif_refus}</p>}
@@ -91,6 +92,10 @@ export default function Espace() {
           <Link to="/admin/utilisateurs" className="carte carte-choix">
             <h2>Gérer les utilisateurs</h2>
             <p>Créer un compte agent, désactiver ou réactiver un compte.</p>
+          </Link>
+          <Link to="/admin/paiements" className="carte carte-choix">
+            <h2>Suivre les paiements</h2>
+            <p>Encaissements, commissions et restitution des cautions.</p>
           </Link>
         </div>
       )}

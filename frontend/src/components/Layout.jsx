@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { LIBELLES_ROLE, useAuth } from '../auth/AuthContext'
+import Notifications from './Notifications'
 
 export default function Layout() {
   const { utilisateur, deconnexion } = useAuth()
@@ -32,6 +33,7 @@ export default function Layout() {
                 <>
                   <NavLink to="/partenaire/vehicules">Mes véhicules</NavLink>
                   <NavLink to="/partenaire/demandes">Demandes</NavLink>
+                  <NavLink to="/partenaire/paiements">Encaissements</NavLink>
                   <NavLink to="/messages">Messages</NavLink>
                 </>
               )}
@@ -39,9 +41,11 @@ export default function Layout() {
                 <>
                   <NavLink to="/admin/partenaires">Partenaires</NavLink>
                   <NavLink to="/admin/utilisateurs">Utilisateurs</NavLink>
+                  <NavLink to="/admin/paiements">Paiements</NavLink>
                 </>
               )}
               <NavLink to="/profil">Profil</NavLink>
+              <Notifications />
               <span className="badge-role">{LIBELLES_ROLE[utilisateur.role]}</span>
               <button type="button" className="bouton bouton-discret" onClick={quitter}>
                 Se déconnecter

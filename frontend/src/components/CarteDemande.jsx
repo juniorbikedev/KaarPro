@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { dateHeure, dateLisible, fcfa, STATUTS_DEMANDE, TYPES_DEMANDE } from '../libelles'
+import { dateHeure, dateLisible, fcfa, STATUTS_CAUTION, STATUTS_DEMANDE, TYPES_DEMANDE } from '../libelles'
 import { SansPhoto } from './CarteVehicule'
 
 /** Résumé d'une demande, commun à l'espace client et à l'espace partenaire ; les actions sont passées en enfants. */
@@ -34,6 +34,13 @@ export default function CarteDemande({ demande, pourPartenaire = false, children
           Envoyée le {dateHeure(demande.cree_le)}
           {demande.contrat && <> · <Link to={`/contrats/${demande.contrat.id}`}>Contrat {demande.contrat.numero}</Link>{demande.contrat.signe_client_le ? ' (signé)' : ' (à signer par le client)'}</>}
         </p>
+        {demande.paiement && (
+          <p className="champ-aide">
+            Payé {fcfa(demande.paiement.montant_total)} par {demande.paiement.operateur} le {dateHeure(demande.paiement.paye_le)}
+            {demande.paiement.statut_caution && <> · {STATUTS_CAUTION[demande.paiement.statut_caution]}</>}
+            {demande.paiement.caution_retenue > 0 && <> ({fcfa(demande.paiement.caution_retenue)} retenus : {demande.paiement.motif_retenue})</>}
+          </p>
+        )}
       </div>
       {children && <div className="ligne-vehicule-actions">{children}</div>}
     </article>

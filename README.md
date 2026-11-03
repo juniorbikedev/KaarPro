@@ -14,7 +14,7 @@ Projet de fin de cycle — Licence 3 Génie logiciel.
 | 2 | Comptes et rôles : client, vendeur/loueur (type d'activité, pièce d'identité), agent, administrateur ; validation des partenaires | fait |
 | 3 | Publication des véhicules (photos, carte grise, assurance), calendrier de disponibilité, catalogue avec filtres | fait |
 | 4 | Demandes de location et d'achat, contrat généré et signé en ligne, messagerie client ↔ partenaire | fait |
-| 5 | Paiement Wave / Orange Money, caution, commission, notifications | à faire |
+| 5 | Paiement Wave / Orange Money (passerelle simulée), commission, caution bloquée puis restituée, notifications | fait |
 | 6 | État des lieux (agent), avis, signalements, tableau de bord | à faire |
 | 7 | Sécurité, tests, déploiement Docker + GitHub Actions | à faire |
 
@@ -86,3 +86,18 @@ $env:PHPRC = "$PWD\.php"; cd backend; C:\wamp64\bin\php\php8.3.14\php.exe artisa
 | POST | `/api/contrats/{id}/signer` (`accepte`) | client |
 | POST | `/api/vehicules/{id}/conversation` | client |
 | GET | `/api/conversations`, `/api/conversations/{id}` ; POST `/api/conversations/{id}/messages` | client, partenaire concerné |
+
+## API du sprint 5
+
+Le paiement passe par une passerelle (`App\Paiement\PasserellePaiement`). En développement, `PAIEMENT_PASSERELLE=simulateur`
+affiche une page de paiement simulée dans l'interface : aucun argent n'est débité. Les passerelles Wave et Orange Money
+se brancheront au même endroit une fois les comptes marchands obtenus. La commission est réglée par `COMMISSION_LOCATION`
+et `COMMISSION_VENTE` (en %).
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| POST | `/api/demandes/{id}/paiements` (`operateur` = wave \| orange_money, `telephone`) — contrat signé requis | client |
+| GET | `/api/paiements/{reference}` ; POST `/api/paiements/{reference}/simulateur` (`resultat` = reussi \| echoue) | client |
+| GET | `/api/partenaire/paiements` (montants, commission, net) | vendeur/loueur validé |
+| GET | `/api/admin/paiements?statut=` ; POST `/api/admin/paiements/{reference}/caution` (`caution_retenue`, `motif_retenue`) | admin |
+| GET | `/api/notifications` ; POST `/api/notifications/{id}/lire`, `/api/notifications/tout-lire` | connecté |
