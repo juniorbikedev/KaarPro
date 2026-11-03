@@ -16,11 +16,14 @@ export default function Catalogue() {
 
   useEffect(() => {
     const filtres = Object.fromEntries([...params.entries()].filter(([, v]) => v))
+    // Une réponse arrivée après un nouveau changement de filtres est ignorée
+    let actuelle = true
     setChargement(true)
     api.get('/vehicules', { params: filtres })
-      .then(({ data }) => { setResultat(data); setErreur('') })
-      .catch((err) => setErreur(erreurApi(err).message))
-      .finally(() => setChargement(false))
+      .then(({ data }) => { if (actuelle) { setResultat(data); setErreur('') } })
+      .catch((err) => { if (actuelle) setErreur(erreurApi(err).message) })
+      .finally(() => { if (actuelle) setChargement(false) })
+    return () => { actuelle = false }
   }, [params])
 
   const changer = (e) => setForm({ ...form, [e.target.name]: e.target.value })

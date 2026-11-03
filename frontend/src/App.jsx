@@ -5,9 +5,13 @@ import Protege from './components/Protege'
 import Accueil from './pages/Accueil'
 import Catalogue from './pages/Catalogue'
 import Connexion from './pages/Connexion'
+import Contrat from './pages/Contrat'
 import Espace from './pages/Espace'
 import FicheVehicule from './pages/FicheVehicule'
+import MesDemandes from './pages/MesDemandes'
+import Messagerie from './pages/Messagerie'
 import CalendrierVehicule from './pages/partenaire/CalendrierVehicule'
+import DemandesRecues from './pages/partenaire/DemandesRecues'
 import FormVehicule from './pages/partenaire/FormVehicule'
 import MesVehicules from './pages/partenaire/MesVehicules'
 import { ChoixInscription, InscriptionClient, InscriptionPartenaire } from './pages/Inscription'
@@ -33,6 +37,11 @@ export default function App() {
             <Route path="partenaire/vehicules/nouveau" element={<Protege roles={['vendeur']}><FormVehicule /></Protege>} />
             <Route path="partenaire/vehicules/:id/modifier" element={<Protege roles={['vendeur']}><FormVehicule /></Protege>} />
             <Route path="partenaire/vehicules/:id/calendrier" element={<Protege roles={['vendeur']}><CalendrierVehicule /></Protege>} />
+            <Route path="partenaire/demandes" element={<Protege roles={['vendeur']}><DemandesRecues /></Protege>} />
+            <Route path="demandes" element={<Protege roles={['client']}><MesDemandes /></Protege>} />
+            <Route path="contrats/:id" element={<Protege roles={['client', 'vendeur', 'admin']}><Contrat /></Protege>} />
+            <Route path="messages" element={<Protege roles={['client', 'vendeur']}><Messagerie /></Protege>} />
+            <Route path="messages/:id" element={<Protege roles={['client', 'vendeur']}><Messagerie /></Protege>} />
             <Route path="profil" element={<Protege><Profil /></Protege>} />
             <Route path="admin/partenaires" element={<Protege roles={['admin']}><Partenaires /></Protege>} />
             <Route path="admin/utilisateurs" element={<Protege roles={['admin']}><Utilisateurs /></Protege>} />

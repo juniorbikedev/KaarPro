@@ -3,9 +3,14 @@
 namespace Database\Seeders;
 
 use App\Enums\Role;
+use App\Enums\StatutDemande;
 use App\Enums\StatutValidation;
 use App\Enums\TypeActivite;
+use App\Enums\TypeDemande;
+use App\Models\Conversation;
+use App\Models\Demande;
 use App\Models\User;
+use App\Models\Vehicule;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -32,7 +37,7 @@ class DatabaseSeeder extends Seeder
             'zone' => 'Dakar Plateau',
         ]);
 
-        User::updateOrCreate(['email' => 'client@kaarpro.test'], [
+        $client = User::updateOrCreate(['email' => 'client@kaarpro.test'], [
             'nom' => 'Client de démonstration',
             'telephone' => '77 000 00 02',
             'password' => $demo,
@@ -81,6 +86,32 @@ class DatabaseSeeder extends Seeder
                 'ville' => $ville, 'mode_offre' => $mode, 'prix_jour' => $jour, 'prix_vente' => $vente,
                 'montant_caution' => $caution,
                 'description' => "{$marque} {$modele} de {$annee}, entretenu régulièrement. Véhicule de démonstration.",
+            ]);
+        }
+
+        // Une demande de location en attente et une conversation, pour essayer le traitement côté loueur
+        $tucson = Vehicule::where('immatriculation', 'DK-2202-AB')->first();
+        $debut = now()->addWeek()->startOfDay();
+        Demande::firstOrCreate(
+            ['client_id' => $client->id, 'vehicule_id' => $tucson->id, 'type' => TypeDemande::Location, 'statut' => StatutDemande::EnAttente],
+            [
+                'partenaire_id' => $tucson->partenaire_id,
+                'date_debut' => $debut->toDateString(),
+                'date_fin' => $debut->copy()->addDays(2)->toDateString(),
+                'nb_jours' => 3,
+                'montant' => 3 * $tucson->prix_jour,
+                'montant_caution' => $tucson->montant_caution,
+                'message' => 'Bonjour, je souhaite louer le Tucson pour un déplacement à Saint-Louis.',
+            ],
+        );
+        $conversation = Conversation::firstOrCreate(
+            ['client_id' => $client->id, 'vehicule_id' => $tucson->id],
+            ['partenaire_id' => $tucson->partenaire_id],
+        );
+        if ($conversation->wasRecentlyCreated) {
+            $conversation->messages()->create([
+                'auteur_id' => $client->id,
+                'contenu' => 'Bonjour, le véhicule peut-il être livré à Dakar Plateau ?',
             ]);
         }
     }

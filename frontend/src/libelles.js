@@ -27,3 +27,22 @@ export function fcfa(montant) {
 export function dateLisible(iso) {
   return new Date(`${iso}T00:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 }
+
+export const TYPES_DEMANDE = { location: 'Location', achat: 'Achat' }
+
+/** Libellé et classe CSS de chaque statut de demande. */
+export const STATUTS_DEMANDE = {
+  en_attente: ['En attente', 'statut-attente'],
+  acceptee: ['Acceptée', 'statut-valide'],
+  refusee: ['Refusée', 'statut-refuse'],
+  annulee: ['Annulée', 'statut-annule'],
+}
+
+/** Nombre de jours d'une location, bornes comprises (du 10 au 12 = 3 jours). */
+export function nbJours(debut, fin) {
+  return Math.round((new Date(`${fin}T00:00:00`) - new Date(`${debut}T00:00:00`)) / 86_400_000) + 1
+}
+
+export function dateHeure(iso) {
+  return new Date(iso).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+}

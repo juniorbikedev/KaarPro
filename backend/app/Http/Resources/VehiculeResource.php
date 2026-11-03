@@ -44,6 +44,7 @@ class VehiculeResource extends JsonResource
                 'date_debut' => $i->date_debut->toDateString(),
                 'date_fin' => $i->date_fin->toDateString(),
                 'motif' => $i->motif,
+                'reservation' => $i->demande_id !== null,
             ])),
             'documents' => DocumentResource::collection($this->whenLoaded('documents')),
             'cree_le' => $this->created_at?->toIso8601String(),

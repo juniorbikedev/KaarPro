@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Indisponibilite extends Model
 {
-    protected $fillable = ['date_debut', 'date_fin', 'motif'];
+    protected $fillable = ['demande_id', 'date_debut', 'date_fin', 'motif'];
 
     protected function casts(): array
     {

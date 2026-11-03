@@ -2,6 +2,7 @@
 
 // Messages de validation en français pour les règles utilisées par l'API KaarPro.
 return [
+    'accepted' => 'Le champ :attribute doit être accepté.',
     'after_or_equal' => 'Le champ :attribute doit être une date postérieure ou égale à :date.',
     'array' => 'Le champ :attribute doit être une liste.',
     'between' => [
@@ -16,6 +17,7 @@ return [
     'required_with' => 'Le champ :attribute est obligatoire quand :values est rempli.',
     'confirmed' => 'La confirmation du champ :attribute ne correspond pas.',
     'email' => 'Le champ :attribute doit être une adresse e-mail valide.',
+    'required_if' => 'Le champ :attribute est obligatoire quand :other vaut :value.',
     'enum' => 'La valeur choisie pour :attribute est invalide.',
     'file' => 'Le champ :attribute doit être un fichier.',
     'max' => [
@@ -64,5 +66,9 @@ return [
         'date_debut' => 'date de début',
         'date_fin' => 'date de fin',
         'prix_max' => 'prix maximum',
+        'type' => 'type de demande',
+        'message' => 'message',
+        'contenu' => 'message',
+        'accepte' => 'acceptation du contrat',
     ],
 ];

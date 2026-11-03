@@ -171,7 +171,53 @@ a { color: var(--bleu); }
 .photo-existante { display: grid; gap: .3rem; width: 120px; }
 .photo-existante img { width: 120px; height: 80px; object-fit: cover; border-radius: 8px; }
 
+/* Sprint 4 : demandes, contrat, messagerie */
+.statut-annule { background: var(--fond); color: var(--gris); }
+.fiche-colonne { display: grid; gap: 1rem; }
+.fiche-colonne .bloc-calendrier { margin-top: 0; max-width: none; }
+.carte-demande { align-items: flex-start; }
+.carte-demande p { margin: 0; }
+.carte-demande-titre { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.citation { margin: .2rem 0; padding: .4rem .7rem; border-left: 3px solid var(--bord); color: var(--gris); font-style: italic; }
+.actions-demande { display: grid; gap: .45rem; min-width: 190px; }
+
+.contrat { max-width: 860px; margin: 0 auto; padding: 2rem; }
+.contrat h1 { text-align: center; margin: 1.5rem 0; }
+.contrat h2 { font-size: 1.05rem; color: var(--bleu); margin: 1.25rem 0 .4rem; border-bottom: 1px solid var(--bord); padding-bottom: .25rem; }
+.contrat-entete { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+.contrat-entete p { margin: 0; }
+.contrat-numero { display: grid; text-align: right; }
+.clauses { display: grid; gap: .4rem; padding-left: 1.2rem; }
+.signature { display: grid; gap: .6rem; justify-items: start; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed var(--bord); }
+.case { display: flex; align-items: center; gap: .5rem; cursor: pointer; }
+
+.messagerie { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+.ligne-conversation { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+.ligne .ligne-conversation strong { color: var(--texte); }
+.pastille-non-lus { background: var(--orange); border-radius: 99px; padding: 0 .45rem; font-size: .75rem; font-weight: 700; }
+.ligne .pastille-non-lus { color: var(--blanc); }
+.apercu { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fil { display: flex; flex-direction: column; gap: .75rem; height: min(70vh, 640px); }
+.fil-entete { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; border-bottom: 1px solid var(--bord); padding-bottom: .6rem; }
+.fil-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: .5rem; padding-right: .25rem; }
+.bulle { align-self: flex-start; max-width: 78%; background: var(--fond); border-radius: 14px 14px 14px 4px; padding: .5rem .75rem; }
+.bulle p { margin: 0 0 .15rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bulle span { font-size: .72rem; color: var(--gris); }
+.bulle-moi { align-self: flex-end; background: var(--bleu); color: var(--blanc); border-radius: 14px 14px 4px 14px; }
+.bulle-moi span { color: #c9d5ea; }
+.fil-saisie { display: flex; gap: .5rem; align-items: flex-end; }
+
+@media print {
+  .entete, .pied, .sans-impression { display: none !important; }
+  body, .page { background: var(--blanc); }
+  .contrat { border: 0; padding: 0; }
+}
+
 @media (max-width: 760px) {
+  .messagerie { grid-template-columns: 1fr; }
+  .fil { height: 70vh; }
+  .contrat { padding: 1.25rem; }
+  .contrat-numero { text-align: left; }
   .grille-2, .grille-3, .maitre-detail, .fiche { grid-template-columns: 1fr; }
   .ligne-vehicule { flex-direction: column; align-items: stretch; }
   .vignette-petite { width: 100%; }

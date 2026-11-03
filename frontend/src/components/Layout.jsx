@@ -22,8 +22,18 @@ export default function Layout() {
           {utilisateur ? (
             <>
               <NavLink to="/espace">Mon espace</NavLink>
+              {utilisateur.role === 'client' && (
+                <>
+                  <NavLink to="/demandes">Mes demandes</NavLink>
+                  <NavLink to="/messages">Messages</NavLink>
+                </>
+              )}
               {utilisateur.role === 'vendeur' && utilisateur.partenaire?.statut_validation === 'valide' && (
-                <NavLink to="/partenaire/vehicules">Mes véhicules</NavLink>
+                <>
+                  <NavLink to="/partenaire/vehicules">Mes véhicules</NavLink>
+                  <NavLink to="/partenaire/demandes">Demandes</NavLink>
+                  <NavLink to="/messages">Messages</NavLink>
+                </>
               )}
               {utilisateur.role === 'admin' && (
                 <>

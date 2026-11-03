@@ -5,6 +5,10 @@ use App\Http\Controllers\Admin\UtilisateurController;
 use App\Http\Controllers\Auth\InscriptionController;
 use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\CatalogueController;
+use App\Http\Controllers\ContratController;
+use App\Http\Controllers\DemandeController;
+use App\Http\Controllers\MessagerieController;
+use App\Http\Controllers\Partenaire\DemandeController as DemandePartenaireController;
 use App\Http\Controllers\Partenaire\IndisponibiliteController;
 use App\Http\Controllers\Partenaire\VehiculeController;
 use App\Http\Controllers\ProfilController;
@@ -41,7 +45,25 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('vehicules/{vehicule}/photos/{photo}', [VehiculeController::class, 'supprimerPhoto']);
         Route::post('vehicules/{vehicule}/indisponibilites', [IndisponibiliteController::class, 'store']);
         Route::delete('vehicules/{vehicule}/indisponibilites/{indisponibilite}', [IndisponibiliteController::class, 'destroy']);
+
+        // Sprint 4 : demandes reçues
+        Route::get('demandes', [DemandePartenaireController::class, 'index']);
+        Route::post('demandes/{demande}/accepter', [DemandePartenaireController::class, 'accepter']);
+        Route::post('demandes/{demande}/refuser', [DemandePartenaireController::class, 'refuser']);
     });
+
+    // Sprint 4 : demandes du client, contrats, messagerie
+    Route::middleware('role:client')->group(function () {
+        Route::get('demandes', [DemandeController::class, 'index']);
+        Route::post('vehicules/{vehicule}/demandes', [DemandeController::class, 'store'])->middleware('throttle:20,1');
+        Route::post('demandes/{demande}/annuler', [DemandeController::class, 'annuler']);
+        Route::post('vehicules/{vehicule}/conversation', [MessagerieController::class, 'demarrer']);
+        Route::post('contrats/{contrat}/signer', [ContratController::class, 'signer']);
+    });
+    Route::get('contrats/{contrat}', [ContratController::class, 'show']);
+    Route::get('conversations', [MessagerieController::class, 'index']);
+    Route::get('conversations/{conversation}', [MessagerieController::class, 'show']);
+    Route::post('conversations/{conversation}/messages', [MessagerieController::class, 'envoyer'])->middleware('throttle:30,1');
 
     Route::prefix('admin')->middleware('role:admin')->group(function () {
         Route::get('utilisateurs', [UtilisateurController::class, 'index']);

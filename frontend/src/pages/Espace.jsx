@@ -32,7 +32,12 @@ function EspacePartenaire({ partenaire }) {
         <h2>{partenaire.nom_commercial}</h2>
         <p><span className={`statut ${statut.classe}`}>{statut.libelle}</span></p>
         <p>{statut.texte}</p>
-        {partenaire.statut_validation === 'valide' && <Link to="/partenaire/vehicules" className="bouton">Gérer mes véhicules</Link>}
+        {partenaire.statut_validation === 'valide' && (
+          <div className="actions">
+            <Link to="/partenaire/vehicules" className="bouton">Gérer mes véhicules</Link>
+            <Link to="/partenaire/demandes" className="bouton bouton-secondaire">Demandes reçues</Link>
+          </div>
+        )}
         {partenaire.motif_refus && <p className="alerte alerte-erreur">Motif : {partenaire.motif_refus}</p>}
       </article>
       <form className="carte" onSubmit={changerActivite}>
@@ -62,8 +67,11 @@ export default function Espace() {
       {utilisateur.role === 'client' && (
         <article className="carte">
           <h2>Votre espace client</h2>
-          <p>Parcourez le catalogue des véhicules de nos partenaires. Les demandes de location et d'achat arrivent au prochain sprint.</p>
-          <Link to="/vehicules" className="bouton">Voir le catalogue</Link>
+          <p>Parcourez le catalogue, envoyez une demande de location ou d'achat et échangez avec les partenaires.</p>
+          <div className="actions">
+            <Link to="/vehicules" className="bouton">Voir le catalogue</Link>
+            <Link to="/demandes" className="bouton bouton-secondaire">Mes demandes</Link>
+          </div>
         </article>
       )}
 

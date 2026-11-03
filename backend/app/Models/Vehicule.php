@@ -57,6 +57,11 @@ class Vehicule extends Model
         return $this->hasMany(Indisponibilite::class)->orderBy('date_debut');
     }
 
+    public function demandes(): HasMany
+    {
+        return $this->hasMany(Demande::class);
+    }
+
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');

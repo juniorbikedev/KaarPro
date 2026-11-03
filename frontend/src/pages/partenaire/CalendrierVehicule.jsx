@@ -69,13 +69,15 @@ export default function CalendrierVehicule() {
             <button className="bouton" disabled={!debut}>Bloquer cette période</button>
           </form>
           <article className="carte">
-            <h2>Périodes bloquées</h2>
+            <h2>Périodes bloquées et réservées</h2>
             {aVenir.length === 0 && <p className="champ-aide">Aucune période bloquée à venir.</p>}
             <ul className="liste-periodes">
               {aVenir.map((i) => (
                 <li key={i.id}>
                   <span>{dateLisible(i.date_debut)} → {dateLisible(i.date_fin)}{i.motif && <span className="champ-aide"> · {i.motif}</span>}</span>
-                  <button type="button" className="lien" onClick={() => supprimer(i)}>Libérer</button>
+                  {i.reservation
+                    ? <Link to="/partenaire/demandes" className="statut statut-valide">Location</Link>
+                    : <button type="button" className="lien" onClick={() => supprimer(i)}>Libérer</button>}
                 </li>
               ))}
             </ul>

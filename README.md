@@ -13,7 +13,7 @@ Projet de fin de cycle — Licence 3 Génie logiciel.
 |---|---|---|
 | 2 | Comptes et rôles : client, vendeur/loueur (type d'activité, pièce d'identité), agent, administrateur ; validation des partenaires | fait |
 | 3 | Publication des véhicules (photos, carte grise, assurance), calendrier de disponibilité, catalogue avec filtres | fait |
-| 4 | Demandes de location et d'achat, contrat, messagerie | à faire |
+| 4 | Demandes de location et d'achat, contrat généré et signé en ligne, messagerie client ↔ partenaire | fait |
 | 5 | Paiement Wave / Orange Money, caution, commission, notifications | à faire |
 | 6 | État des lieux (agent), avis, signalements, tableau de bord | à faire |
 | 7 | Sécurité, tests, déploiement Docker + GitHub Actions | à faire |
@@ -73,3 +73,16 @@ $env:PHPRC = "$PWD\.php"; cd backend; C:\wamp64\bin\php\php8.3.14\php.exe artisa
 | POST | `/api/partenaire/vehicules/{id}/retirer`, `/republier` | vendeur/loueur validé |
 | POST, DELETE | `/api/partenaire/vehicules/{id}/photos`, `/photos/{photo}` | vendeur/loueur validé |
 | POST, DELETE | `/api/partenaire/vehicules/{id}/indisponibilites`, `/indisponibilites/{id}` | vendeur/loueur validé |
+
+## API du sprint 4
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| POST | `/api/vehicules/{id}/demandes` (`type` = location \| achat, `date_debut`, `date_fin`, `message`) | client |
+| GET | `/api/demandes`, POST `/api/demandes/{id}/annuler` | client |
+| GET | `/api/partenaire/demandes?statut=` | vendeur/loueur validé |
+| POST | `/api/partenaire/demandes/{id}/accepter` (bloque le calendrier, génère le contrat), `/refuser` (`motif`) | vendeur/loueur validé |
+| GET | `/api/contrats/{id}` | client, partenaire concerné, admin |
+| POST | `/api/contrats/{id}/signer` (`accepte`) | client |
+| POST | `/api/vehicules/{id}/conversation` | client |
+| GET | `/api/conversations`, `/api/conversations/{id}` ; POST `/api/conversations/{id}/messages` | client, partenaire concerné |

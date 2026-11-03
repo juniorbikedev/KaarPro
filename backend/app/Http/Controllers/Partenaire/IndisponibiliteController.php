@@ -41,6 +41,7 @@ class IndisponibiliteController extends Controller
     {
         $this->verifierProprietaire($request, $vehicule);
         abort_unless($indisponibilite->vehicule_id === $vehicule->id, 404);
+        abort_if($indisponibilite->demande_id !== null, 422, 'Cette période correspond à une location acceptée.');
         $indisponibilite->delete();
 
         return response()->json(['message' => 'Période supprimée.']);

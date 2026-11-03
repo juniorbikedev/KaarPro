@@ -51,6 +51,11 @@ class Partenaire extends Model
         return $this->hasMany(Vehicule::class);
     }
 
+    public function demandes(): HasMany
+    {
+        return $this->hasMany(Demande::class);
+    }
+
     public function estValide(): bool
     {
         return $this->statut_validation === StatutValidation::Valide;
