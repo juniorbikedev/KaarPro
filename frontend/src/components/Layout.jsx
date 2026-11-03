@@ -18,9 +18,13 @@ export default function Layout() {
           Kaar<strong>Pro</strong>
         </Link>
         <nav className="menu">
+          <NavLink to="/vehicules" end>Catalogue</NavLink>
           {utilisateur ? (
             <>
               <NavLink to="/espace">Mon espace</NavLink>
+              {utilisateur.role === 'vendeur' && utilisateur.partenaire?.statut_validation === 'valide' && (
+                <NavLink to="/partenaire/vehicules">Mes véhicules</NavLink>
+              )}
               {utilisateur.role === 'admin' && (
                 <>
                   <NavLink to="/admin/partenaires">Partenaires</NavLink>

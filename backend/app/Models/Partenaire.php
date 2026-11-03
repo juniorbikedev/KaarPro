@@ -7,6 +7,7 @@ use App\Enums\TypeActivite;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
@@ -43,6 +44,11 @@ class Partenaire extends Model
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');
+    }
+
+    public function vehicules(): HasMany
+    {
+        return $this->hasMany(Vehicule::class);
     }
 
     public function estValide(): bool

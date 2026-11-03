@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'role' => \App\Http\Middleware\VerifierRole::class,
+            'partenaire.valide' => \App\Http\Middleware\PartenaireValide::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

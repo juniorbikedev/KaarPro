@@ -5,7 +5,7 @@ import { LIBELLES_ACTIVITE, useAuth } from '../auth/AuthContext'
 
 const STATUTS = {
   en_attente: { libelle: 'En attente de validation', classe: 'statut-attente', texte: "Un administrateur vérifie votre pièce d'identité. Vous pourrez publier vos véhicules dès la validation." },
-  valide: { libelle: 'Compte validé', classe: 'statut-valide', texte: 'Votre compte est validé. La publication des véhicules arrive au prochain sprint.' },
+  valide: { libelle: 'Compte validé', classe: 'statut-valide', texte: 'Votre compte est validé : vous pouvez publier vos véhicules.' },
   refuse: { libelle: 'Compte refusé', classe: 'statut-refuse', texte: "Votre inscription a été refusée. Contactez TerangaAuto pour en savoir plus." },
 }
 
@@ -32,6 +32,7 @@ function EspacePartenaire({ partenaire }) {
         <h2>{partenaire.nom_commercial}</h2>
         <p><span className={`statut ${statut.classe}`}>{statut.libelle}</span></p>
         <p>{statut.texte}</p>
+        {partenaire.statut_validation === 'valide' && <Link to="/partenaire/vehicules" className="bouton">Gérer mes véhicules</Link>}
         {partenaire.motif_refus && <p className="alerte alerte-erreur">Motif : {partenaire.motif_refus}</p>}
       </article>
       <form className="carte" onSubmit={changerActivite}>
@@ -61,7 +62,8 @@ export default function Espace() {
       {utilisateur.role === 'client' && (
         <article className="carte">
           <h2>Votre espace client</h2>
-          <p>La recherche, la location et l'achat de véhicules arrivent aux prochains sprints. Votre compte est prêt.</p>
+          <p>Parcourez le catalogue des véhicules de nos partenaires. Les demandes de location et d'achat arrivent au prochain sprint.</p>
+          <Link to="/vehicules" className="bouton">Voir le catalogue</Link>
         </article>
       )}
 

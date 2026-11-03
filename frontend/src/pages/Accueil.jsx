@@ -14,14 +14,14 @@ export default function Accueil() {
             KaarPro réunit les véhicules de partenaires vérifiés par TerangaAuto : particuliers et agences qui vendent,
             louent, ou font les deux.
           </p>
-          {utilisateur ? (
-            <Link to="/espace" className="bouton">Accéder à mon espace</Link>
-          ) : (
-            <div className="actions">
-              <Link to="/inscription/client" className="bouton">Je cherche un véhicule</Link>
+          <div className="actions">
+            <Link to="/vehicules" className="bouton">Voir les véhicules</Link>
+            {utilisateur ? (
+              <Link to="/espace" className="bouton bouton-secondaire">Accéder à mon espace</Link>
+            ) : (
               <Link to="/inscription/partenaire" className="bouton bouton-secondaire">Je propose mes véhicules</Link>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </section>
 

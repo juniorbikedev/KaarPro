@@ -12,7 +12,7 @@ Projet de fin de cycle — Licence 3 Génie logiciel.
 | Sprint | Contenu | État |
 |---|---|---|
 | 2 | Comptes et rôles : client, vendeur/loueur (type d'activité, pièce d'identité), agent, administrateur ; validation des partenaires | fait |
-| 3 | Publication des véhicules, calendrier, catalogue | à faire |
+| 3 | Publication des véhicules (photos, carte grise, assurance), calendrier de disponibilité, catalogue avec filtres | fait |
 | 4 | Demandes de location et d'achat, contrat, messagerie | à faire |
 | 5 | Paiement Wave / Orange Money, caution, commission, notifications | à faire |
 | 6 | État des lieux (agent), avis, signalements, tableau de bord | à faire |
@@ -61,3 +61,15 @@ $env:PHPRC = "$PWD\.php"; cd backend; C:\wamp64\bin\php\php8.3.14\php.exe artisa
 | GET | `/api/admin/partenaires?statut=`, `/api/admin/partenaires/{id}` | admin |
 | POST | `/api/admin/partenaires/{id}/valider`, `/refuser` | admin |
 | GET | `/api/admin/documents/{id}/fichier` | admin |
+
+## API du sprint 3
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| GET | `/api/vehicules?q=&categorie=&offre=&ville=&prix_max=&date_debut=&date_fin=&tri=` | public |
+| GET | `/api/vehicules/{id}`, `/api/photos/{id}` | public |
+| GET, POST | `/api/partenaire/vehicules` (multipart : `photos[]`, `carte_grise`, `assurance`) | vendeur/loueur validé |
+| GET, PUT | `/api/partenaire/vehicules/{id}` | vendeur/loueur validé |
+| POST | `/api/partenaire/vehicules/{id}/retirer`, `/republier` | vendeur/loueur validé |
+| POST, DELETE | `/api/partenaire/vehicules/{id}/photos`, `/photos/{photo}` | vendeur/loueur validé |
+| POST, DELETE | `/api/partenaire/vehicules/{id}/indisponibilites`, `/indisponibilites/{id}` | vendeur/loueur validé |
