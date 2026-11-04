@@ -1,4 +1,9 @@
-# Base de données de développement. Lancer avec : docker compose up -d
+# KaarPro sur le poste, avec Docker et PostgreSQL : docker compose up -d --build
+#   Application : http://localhost:8080   (comptes de démonstration : voir backend/.env)
+#   Base seule, pour développer avec dev-api.ps1 : docker compose up -d postgres
+# Les réglages (APP_KEY, comptes, commissions…) viennent de backend/.env ; ceux propres à Docker sont fixés ci-dessous.
+name: kaarpro
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -16,7 +21,37 @@ services:
       test: ["CMD-SHELL", "pg_isready -U kaarpro -d kaarpro"]
       interval: 5s
       timeout: 3s
-      retries: 10
+      retries: 20
+
+  api:
+    build: ./backend
+    image: kaarpro-api:local
+    env_file: ./backend/.env
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: kaarpro
+      DB_USERNAME: kaarpro
+      DB_PASSWORD: kaarpro-dev
+      APP_URL: http://localhost:8080
+      FRONTEND_URL: http://localhost:8080
+      SEED_DEMO: "true"
+      LOG_CHANNEL: stderr
+    volumes:
+      - kaarpro-fichiers:/var/www/html/storage/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build: ./frontend
+    image: kaarpro-web:local
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
 
 volumes:
   kaarpro-pgdata:
+  kaarpro-fichiers:

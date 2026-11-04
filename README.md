@@ -5,7 +5,7 @@ Projet de fin de cycle — Licence 3 Génie logiciel.
 
 - `backend/` : API REST Laravel 12 (PHP 8.3, Sanctum, PostgreSQL)
 - `frontend/` : interface React (Vite, React Router, Axios)
-- `docker-compose.yml` : base PostgreSQL de développement (port 5433 du poste)
+- `docker-compose.yml` : KaarPro complet sur le poste (PostgreSQL, API, interface) sur http://localhost:8080
 - `docker-compose.prod.yml` : déploiement (PostgreSQL, API, interface, Caddy pour HTTPS)
 - `.github/workflows/ci-cd.yml` : intégration et déploiement continus
 
@@ -20,15 +20,36 @@ Projet de fin de cycle — Licence 3 Génie logiciel.
 | 6 | États des lieux par l'agent (photos, dommages), avis et notes, signalements, tableau de bord administrateur | fait |
 | 7 | Sécurité (hachage, rôles, HTTPS, en-têtes, expiration des jetons), tests sur PostgreSQL, images Docker, GitHub Actions | fait |
 
+## Démarrer avec Docker et PostgreSQL (le plus simple)
+
+Prérequis : Docker Desktop lancé.
+
+```powershell
+cd backend; copy .env.example .env; cd ..   # une seule fois : clé, comptes de démonstration, commissions
+docker compose up -d --build                 # PostgreSQL + API + interface
+```
+
+L'application est sur **http://localhost:8080** (connexion : http://localhost:8080/connexion).
+Au premier démarrage, l'API applique les migrations dans PostgreSQL et crée les comptes et véhicules de démonstration
+(identifiants dans `backend/.env`). Les données et les fichiers déposés sont gardés dans des volumes Docker.
+
+```powershell
+docker compose logs -f api      # journaux de l'API
+docker compose up -d --build    # après une modification du code
+docker compose down             # arrêter (les données restent)
+docker compose down -v          # arrêter et effacer la base et les fichiers
+```
+
 ## Démarrer en développement (Windows)
 
+Pour modifier le code avec rechargement immédiat, l'API tourne avec le PHP de WAMP et l'interface avec Vite.
 Prérequis : WAMP (PHP 8.3), Composer, Node.js, Docker Desktop.
 Le dossier `.php/` contient un `php.ini` propre au projet qui active `pdo_pgsql` sans modifier WAMP
 (il n'est pas versionné : le recréer à partir du `php.ini` de WAMP en activant `pdo_pgsql` et `pgsql`).
 
 ```powershell
-# 1. Base de données (Docker Desktop doit être lancé)
-docker compose up -d
+# 1. Base de données seule (port 5433 du poste ; Docker Desktop doit être lancé)
+docker compose up -d postgres
 
 # 2. API sur http://localhost:8000 (migrations + comptes de démonstration)
 cd backend; copy .env.example .env; cd ..

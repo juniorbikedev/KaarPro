@@ -1,5 +1,8 @@
 # Déploiement de KaarPro : docker compose -f docker-compose.prod.yml --env-file .env.production up -d
 # Les images sont construites par GitHub Actions et publiées sur ghcr.io ; « build » permet aussi de les construire sur place.
+# Projet distinct de docker-compose.yml (pile locale) pour que les deux ne se marchent pas dessus
+name: kaarpro-prod
+
 services:
   postgres:
     image: postgres:16-alpine
