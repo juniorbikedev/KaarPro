@@ -1,0 +1,59 @@
+# Déploiement de KaarPro : docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+# Les images sont construites par GitHub Actions et publiées sur ghcr.io ; « build » permet aussi de les construire sur place.
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - donnees-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    image: ghcr.io/juniorbikedev/kaarpro-api:${VERSION:-latest}
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+    volumes:
+      # Photos, documents et constats déposés par les utilisateurs
+      - fichiers-kaarpro:/var/www/html/storage/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    image: ghcr.io/juniorbikedev/kaarpro-web:${VERSION:-latest}
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      DOMAINE: ${DOMAINE:-localhost}
+    ports:
+      - "${PORT_HTTP:-80}:80"
+      - "${PORT_HTTPS:-443}:443"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - certificats-caddy:/data
+    depends_on:
+      - web
+
+volumes:
+  donnees-postgres:
+  fichiers-kaarpro:
+  certificats-caddy:

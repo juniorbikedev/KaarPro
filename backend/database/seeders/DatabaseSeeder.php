@@ -23,11 +23,7 @@ class DatabaseSeeder extends Seeder
     {
         $demo = env('DEMO_PASSWORD', 'kaarpro-demo-2026');
 
-        User::updateOrCreate(['email' => env('ADMIN_EMAIL', 'admin@kaarpro.test')], [
-            'nom' => 'Administrateur KaarPro',
-            'password' => env('ADMIN_PASSWORD', $demo),
-            'role' => Role::Admin,
-        ]);
+        $this->call(AdministrateurSeeder::class);
 
         User::updateOrCreate(['email' => 'agent@kaarpro.test'], [
             'nom' => 'Agent Dakar Plateau',

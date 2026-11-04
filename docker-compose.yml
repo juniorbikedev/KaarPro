@@ -8,7 +8,8 @@ services:
       POSTGRES_USER: kaarpro
       POSTGRES_PASSWORD: kaarpro-dev
     ports:
-      - "5432:5432"
+      # 5433 côté poste : le port 5432 est souvent pris par un PostgreSQL installé sur Windows
+      - "5433:5432"
     volumes:
       - kaarpro-pgdata:/var/lib/postgresql/data
     healthcheck:

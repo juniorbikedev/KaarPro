@@ -1,0 +1,11 @@
+# Point d'entrée HTTPS. Avec un vrai nom de domaine (DOMAINE=kaarpro.sn), Caddy obtient et renouvelle
+# seul le certificat Let's Encrypt ; avec « localhost », il utilise un certificat local pour les essais.
+{$DOMAINE:localhost} {
+	encode gzip
+	# « defer » remplace l'en-tête éventuellement envoyé par l'API au lieu de le doubler
+	header {
+		defer
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	}
+	reverse_proxy web:80
+}

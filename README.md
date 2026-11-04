@@ -5,7 +5,9 @@ Projet de fin de cycle — Licence 3 Génie logiciel.
 
 - `backend/` : API REST Laravel 12 (PHP 8.3, Sanctum, PostgreSQL)
 - `frontend/` : interface React (Vite, React Router, Axios)
-- `docker-compose.yml` : base PostgreSQL de développement
+- `docker-compose.yml` : base PostgreSQL de développement (port 5433 du poste)
+- `docker-compose.prod.yml` : déploiement (PostgreSQL, API, interface, Caddy pour HTTPS)
+- `.github/workflows/ci-cd.yml` : intégration et déploiement continus
 
 ## Avancement
 
@@ -16,7 +18,7 @@ Projet de fin de cycle — Licence 3 Génie logiciel.
 | 4 | Demandes de location et d'achat, contrat généré et signé en ligne, messagerie client ↔ partenaire | fait |
 | 5 | Paiement Wave / Orange Money (passerelle simulée), commission, caution bloquée puis restituée, notifications | fait |
 | 6 | États des lieux par l'agent (photos, dommages), avis et notes, signalements, tableau de bord administrateur | fait |
-| 7 | Sécurité, tests, déploiement Docker + GitHub Actions | à faire |
+| 7 | Sécurité (hachage, rôles, HTTPS, en-têtes, expiration des jetons), tests sur PostgreSQL, images Docker, GitHub Actions | fait |
 
 ## Démarrer en développement (Windows)
 
@@ -42,9 +44,51 @@ leurs identifiants de test sont définis dans `backend/.env.example`.
 
 ## Tests
 
+Par défaut, les tests tournent sur SQLite en mémoire. GitHub Actions les lance sur PostgreSQL ; pour faire de même
+sur le poste, démarrer la base de développement et créer une fois la base `kaarpro_tests` :
+
 ```powershell
 $env:PHPRC = "$PWD\.php"; cd backend; C:\wamp64\bin\php\php8.3.14\php.exe artisan test
+
+# Sur PostgreSQL (docker compose up -d, puis une fois : docker exec kaarpro-postgres createdb -U kaarpro kaarpro_tests)
+$env:DB_CONNECTION="pgsql"; $env:DB_PORT="5433"; $env:DB_DATABASE="kaarpro_tests"; $env:DB_USERNAME="kaarpro"; $env:DB_PASSWORD="kaarpro-dev"
+C:\wamp64\bin\php\php8.3.14\php.exe artisan test
 ```
+
+## Sécurité
+
+- **Mots de passe hachés** (bcrypt), d'au moins 8 caractères.
+- **Accès selon le rôle** : chaque route est réservée à son rôle (client, vendeur/loueur validé, agent, administrateur)
+  et chaque ressource vérifie qu'elle appartient à l'utilisateur (demande, contrat, conversation, constat…).
+- **HTTPS** en production par Caddy (certificat Let's Encrypt renouvelé automatiquement), avec HSTS.
+- Compléments : jetons d'accès expirant après 7 jours (`SANCTUM_EXPIRATION`), essais de connexion limités (10 par minute),
+  en-têtes de sécurité, origines autorisées (`CORS_ORIGINES`), documents et photos de constat privés (lien signé).
+
+## Déploiement
+
+```
+Internet ──HTTPS──▶ Caddy ──▶ web (Nginx : React compilé ; /api ─FastCGI─▶ api : Laravel PHP-FPM) ──▶ postgres
+```
+
+Sur un serveur Linux avec Docker :
+
+```bash
+git clone https://github.com/juniorbikedev/KaarPro.git /opt/kaarpro && cd /opt/kaarpro
+cp .env.production.example .env.production   # renseigner DOMAINE, APP_URL, mots de passe…
+docker compose -f docker-compose.prod.yml --env-file .env.production run --rm api php artisan key:generate --show
+# copier la clé affichée dans APP_KEY, puis :
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+```
+
+Au démarrage, l'API met sa configuration en cache, applique les migrations et crée le compte administrateur
+(`ADMIN_EMAIL`, `ADMIN_PASSWORD`). Aucun compte de démonstration n'est créé en production.
+
+**GitHub Actions** (`.github/workflows/ci-cd.yml`) :
+
+1. à chaque push : tests de l'API sur PostgreSQL, lint et compilation de l'interface ;
+2. sur `main` : construction et publication des images `ghcr.io/juniorbikedev/kaarpro-api` et `kaarpro-web` ;
+3. sur `main`, si la variable de dépôt `DEPLOIEMENT_ACTIF` vaut `true` : connexion SSH au serveur
+   (secrets `SERVEUR_HOTE`, `SERVEUR_UTILISATEUR`, `SERVEUR_CLE_SSH`), puis `docker compose pull` et `up -d`.
 
 ## API du sprint 2
 
