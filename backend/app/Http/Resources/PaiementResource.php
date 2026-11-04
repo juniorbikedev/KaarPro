@@ -17,6 +17,8 @@ class PaiementResource extends JsonResource
             'operateur_libelle' => $this->operateur->libelle(),
             'telephone' => $this->telephone,
             'statut' => $this->statut->value,
+            // Avec le simulateur, la page de paiement propose de valider ou refuser ; sinon elle attend la confirmation de l'opérateur
+            'simulation' => config('kaarpro.paiement.passerelle') === 'simulateur',
             'montant' => $this->montant,
             'montant_caution' => $this->montant_caution,
             'montant_total' => $this->montant_total,

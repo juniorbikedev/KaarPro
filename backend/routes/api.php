@@ -22,6 +22,7 @@ use App\Http\Controllers\Partenaire\PaiementController as PaiementPartenaireCont
 use App\Http\Controllers\Partenaire\VehiculeController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\SignalementController;
+use App\Http\Controllers\Webhooks\PaytechController;
 use Illuminate\Support\Facades\Route;
 
 // Sprint 3 : catalogue public
@@ -29,6 +30,8 @@ Route::get('vehicules', [CatalogueController::class, 'index']);
 Route::get('vehicules/{vehicule}', [CatalogueController::class, 'show']);
 Route::get('photos/{photo}', [CatalogueController::class, 'photo'])->name('photos.show');
 Route::get('vehicules/{vehicule}/avis', [AvisController::class, 'index']);
+// Notification de paiement envoyée par PayTech (sans jeton : la requête est authentifiée par sa signature)
+Route::post('webhooks/paytech', PaytechController::class)->name('webhooks.paytech')->middleware('throttle:60,1');
 // Sprint 6 : photos d'état des lieux, servies par lien signé et temporaire
 Route::get('etats-des-lieux/photos/{photo}', [EtatDesLieuxController::class, 'photo'])->name('etats-des-lieux.photo')->middleware('signed');
 

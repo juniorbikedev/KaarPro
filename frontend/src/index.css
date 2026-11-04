@@ -79,6 +79,7 @@ a { color: var(--bleu); }
 .alerte { border-radius: 9px; padding: .6rem .8rem; margin: 0; }
 .alerte-erreur { background: #fdecea; color: var(--rouge); }
 .alerte-succes { background: #e8f6ee; color: var(--vert); }
+.alerte-attente { background: #fff4d6; color: var(--jaune); }
 
 .statut { display: inline-block; border-radius: 99px; padding: .1rem .65rem; font-size: .8rem; font-weight: 600; }
 .statut-attente { background: #fff4d6; color: var(--jaune); }

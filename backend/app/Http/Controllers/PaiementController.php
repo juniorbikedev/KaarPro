@@ -11,6 +11,7 @@ use App\Paiement\Encaissement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use RuntimeException;
 
 /** Cas « Payer par Wave ou Orange Money » (client). */
 class PaiementController extends Controller
@@ -30,7 +31,12 @@ class PaiementController extends Controller
             'telephone' => ['required', 'regex:/^(\+221)?7[05678]\d{7}$/'],
         ]);
 
-        [$paiement, $url] = $encaissement->ouvrir($demande, $donnees['operateur'], $donnees['telephone']);
+        try {
+            [$paiement, $url] = $encaissement->ouvrir($demande, $donnees['operateur'], $donnees['telephone']);
+        } catch (RuntimeException $erreur) {
+            report($erreur);
+            abort(502, 'Le service de paiement est momentanément indisponible. Réessayez dans quelques minutes.');
+        }
 
         return response()->json([
             'data' => new PaiementResource($paiement->refresh()->load(self::RELATIONS)),

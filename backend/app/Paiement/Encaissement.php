@@ -43,7 +43,13 @@ class Encaissement
             'statut' => StatutPaiement::EnAttente,
         ]);
 
-        return [$paiement, $this->passerelle->initier($paiement)];
+        try {
+            return [$paiement, $this->passerelle->initier($paiement)];
+        } catch (\Throwable $erreur) {
+            // La tentative n'a pas pu être ouverte chez l'opérateur : le client pourra réessayer
+            $paiement->update(['statut' => StatutPaiement::Echoue]);
+            throw $erreur;
+        }
     }
 
     /** Résultat transmis par l'opérateur (ou par le simulateur). */

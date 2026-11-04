@@ -154,15 +154,23 @@ Au démarrage, l'API met sa configuration en cache, applique les migrations et c
 
 ## API du sprint 5
 
-Le paiement passe par une passerelle (`App\Paiement\PasserellePaiement`). En développement, `PAIEMENT_PASSERELLE=simulateur`
-affiche une page de paiement simulée dans l'interface : aucun argent n'est débité. Les passerelles Wave et Orange Money
-se brancheront au même endroit une fois les comptes marchands obtenus. La commission est réglée par `COMMISSION_LOCATION`
-et `COMMISSION_VENTE` (en %).
+Le paiement passe par une passerelle (`App\Paiement\PasserellePaiement`), choisie par `PAIEMENT_PASSERELLE` :
+
+- `simulateur` (développement) : une page de l'interface simule l'opérateur ; aucun argent n'est débité ;
+- `paytech` : l'agrégateur [PayTech](https://paytech.sn) donne accès à Wave et Orange Money avec un seul compte marchand.
+  KaarPro demande un jeton de paiement (`PAYTECH_API_KEY`, `PAYTECH_API_SECRET`), redirige le client vers la page PayTech
+  du moyen choisi, puis PayTech confirme le paiement en appelant `POST /api/webhooks/paytech` (IPN). La notification est
+  authentifiée (HMAC ou empreintes SHA-256 des clés) et le montant contrôlé en production. PayTech n'appelle qu'une adresse
+  **HTTPS** : la confirmation automatique ne fonctionne donc qu'une fois KaarPro déployé sur un domaine.
+  Avec `PAYTECH_ENV=test`, PayTech débite réellement 100 à 150 FCFA par paiement ; `prod` exige l'activation du compte.
+
+La commission est réglée par `COMMISSION_LOCATION` et `COMMISSION_VENTE` (en %).
 
 | Méthode | Route | Rôle |
 |---|---|---|
 | POST | `/api/demandes/{id}/paiements` (`operateur` = wave \| orange_money, `telephone`) — contrat signé requis | client |
 | GET | `/api/paiements/{reference}` ; POST `/api/paiements/{reference}/simulateur` (`resultat` = reussi \| echoue) | client |
+| POST | `/api/webhooks/paytech` (notification PayTech, authentifiée par signature) | PayTech |
 | GET | `/api/partenaire/paiements` (montants, commission, net) | vendeur/loueur validé |
 | GET | `/api/admin/paiements?statut=` ; POST `/api/admin/paiements/{reference}/caution` (`caution_retenue`, `motif_retenue`) | admin |
 | GET | `/api/notifications` ; POST `/api/notifications/{id}/lire`, `/api/notifications/tout-lire` | connecté |
