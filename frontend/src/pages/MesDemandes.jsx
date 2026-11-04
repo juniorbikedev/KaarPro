@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api, erreurApi } from '../api'
 import CarteDemande from '../components/CarteDemande'
+import Etoiles from '../components/Etoiles'
 import { fcfa, OPERATEURS } from '../libelles'
 
 /** Choix de l'opérateur et du numéro, puis redirection vers la page de paiement de l'opérateur. */
@@ -55,7 +56,36 @@ function FormPaiement({ demande, onFermer }) {
   )
 }
 
-/** Cas « Suivre ses demandes » (client) : annuler, signer le contrat, payer. */
+/** Avis du client une fois la transaction terminée (véhicule rendu ou remis). */
+function FormAvis({ demande, onEnvoye }) {
+  const [note, setNote] = useState(0)
+  const [commentaire, setCommentaire] = useState('')
+  const [erreur, setErreur] = useState('')
+
+  async function envoyer(e) {
+    e.preventDefault()
+    setErreur('')
+    try {
+      await api.post(`/demandes/${demande.id}/avis`, { note, commentaire })
+      onEnvoye({ note, commentaire })
+    } catch (err) {
+      const e2 = erreurApi(err)
+      setErreur(Object.values(e2.champs)[0] ?? e2.message)
+    }
+  }
+
+  return (
+    <form className="form-avis" onSubmit={envoyer}>
+      <span className="champ-libelle">Votre avis</span>
+      <Etoiles note={note} onChange={setNote} />
+      <textarea rows={2} maxLength={1000} placeholder="Commentaire (facultatif)" value={commentaire} onChange={(e) => setCommentaire(e.target.value)} />
+      {erreur && <p className="champ-erreur">{erreur}</p>}
+      <button className="bouton bouton-petit" disabled={!note}>Publier l’avis</button>
+    </form>
+  )
+}
+
+/** Cas « Suivre ses demandes » (client) : annuler, signer le contrat, payer, donner son avis. */
 export default function MesDemandes() {
   const [demandes, setDemandes] = useState(null)
   const [erreur, setErreur] = useState('')
@@ -94,6 +124,8 @@ export default function MesDemandes() {
               {d.statut === 'acceptee' && !signe && <Link to={`/contrats/${d.contrat.id}`} className="bouton">Signer le contrat</Link>}
               {d.statut === 'acceptee' && signe && aPayer !== d.id && <button type="button" className="bouton" onClick={() => setAPayer(d.id)}>Payer</button>}
               {aPayer === d.id && <FormPaiement demande={d} onFermer={() => setAPayer(null)} />}
+              {d.peut_donner_avis && <FormAvis demande={d} onEnvoye={(avis) => setDemandes((liste) => liste.map((x) => (x.id === d.id ? { ...x, avis, peut_donner_avis: false } : x)))} />}
+              {d.avis && <p className="avis-donne"><Etoiles note={d.avis.note} /> <span className="champ-aide">Votre avis</span></p>}
             </CarteDemande>
           )
         })}

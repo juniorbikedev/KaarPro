@@ -15,7 +15,7 @@ Projet de fin de cycle — Licence 3 Génie logiciel.
 | 3 | Publication des véhicules (photos, carte grise, assurance), calendrier de disponibilité, catalogue avec filtres | fait |
 | 4 | Demandes de location et d'achat, contrat généré et signé en ligne, messagerie client ↔ partenaire | fait |
 | 5 | Paiement Wave / Orange Money (passerelle simulée), commission, caution bloquée puis restituée, notifications | fait |
-| 6 | État des lieux (agent), avis, signalements, tableau de bord | à faire |
+| 6 | États des lieux par l'agent (photos, dommages), avis et notes, signalements, tableau de bord administrateur | fait |
 | 7 | Sécurité, tests, déploiement Docker + GitHub Actions | à faire |
 
 ## Démarrer en développement (Windows)
@@ -101,3 +101,20 @@ et `COMMISSION_VENTE` (en %).
 | GET | `/api/partenaire/paiements` (montants, commission, net) | vendeur/loueur validé |
 | GET | `/api/admin/paiements?statut=` ; POST `/api/admin/paiements/{reference}/caution` (`caution_retenue`, `motif_retenue`) | admin |
 | GET | `/api/notifications` ; POST `/api/notifications/{id}/lire`, `/api/notifications/tout-lire` | connecté |
+
+## API du sprint 6
+
+Le paiement crée les missions : état des lieux de départ et de retour pour une location, contrôle avant remise pour
+une vente. La caution d'une location ne se restitue qu'après l'état des lieux de retour ; la retenue proposée par
+l'agent pré-remplit le formulaire de l'administrateur. Les photos des constats sont privées et servies par lien signé.
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| GET | `/api/agent/missions?filtre=disponibles\|miennes\|realisees` | agent |
+| POST | `/api/agent/missions/{id}/prendre`, `/realiser` (multipart : `kilometrage`, `niveau_carburant`, `observations`, `dommages`, `montant_dommages`, `photos[]`) | agent |
+| GET | `/api/etats-des-lieux/{id}` | client, partenaire concerné, agent, admin |
+| GET | `/api/vehicules/{id}/avis` ; POST `/api/demandes/{id}/avis` (`note`, `commentaire`) | public ; client |
+| POST | `/api/signalements` (`vehicule_id` ou `utilisateur_id`, `motif`, `description`) | connecté |
+| GET | `/api/admin/signalements?statut=` ; POST `/api/admin/signalements/{id}/traiter` (`statut`, `decision`, `mesure`) | admin |
+| POST | `/api/admin/avis/{id}/masquer` | admin |
+| GET | `/api/admin/tableau-de-bord` | admin |

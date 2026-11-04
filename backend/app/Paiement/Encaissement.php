@@ -3,13 +3,17 @@
 namespace App\Paiement;
 
 use App\Enums\EtatVehicule;
+use App\Enums\Role;
 use App\Enums\StatutDemande;
 use App\Enums\StatutPaiement;
 use App\Enums\TypeDemande;
+use App\Enums\TypeEtatDesLieux;
 use App\Models\Demande;
 use App\Models\Paiement;
+use App\Models\User;
 use App\Notifications\Alerte;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 /** Règles d'argent de la plateforme : calcul de la commission, ouverture et confirmation d'un paiement. */
@@ -66,6 +70,14 @@ class Encaissement
             $demande = $paiement->demande;
             $demande->update(['statut' => StatutDemande::Payee]);
 
+            // Missions confiées aux agents : départ et retour pour une location, contrôle avant remise pour une vente
+            $types = $demande->type === TypeDemande::Location
+                ? [TypeEtatDesLieux::Depart, TypeEtatDesLieux::Retour]
+                : [TypeEtatDesLieux::Remise];
+            foreach ($types as $type) {
+                $demande->etatsDesLieux()->create(['type' => $type]);
+            }
+
             // Une vente payée retire le véhicule du catalogue et clôt les autres demandes
             if ($demande->type === TypeDemande::Achat) {
                 $demande->vehicule->update(['etat' => EtatVehicule::Vendu]);
@@ -90,6 +102,10 @@ class Encaissement
             "Votre paiement de {$montant} FCFA pour le {$vehicule} a été reçu.", '/demandes'));
         $demande->partenaire->user->notify(new Alerte('paiement', 'Paiement reçu',
             "{$demande->client->nom} a payé pour le {$vehicule}. Montant qui vous revient : {$net} FCFA.", '/partenaire/paiements'));
+
+        $agents = User::where('role', Role::Agent)->where('est_actif', true)->get();
+        Notification::send($agents, new Alerte('mission', 'Nouvelle mission',
+            "État des lieux à réaliser pour le {$vehicule} ({$demande->vehicule->ville}).", '/agent/missions'));
 
         return $paiement->refresh();
     }

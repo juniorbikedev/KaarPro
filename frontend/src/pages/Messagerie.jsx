@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api, erreurApi } from '../api'
+import Signaler from '../components/Signaler'
 import { dateHeure } from '../libelles'
 
 const INTERVALLE = 10_000 // rafraîchissement des messages, en millisecondes
@@ -48,6 +49,7 @@ function Fil({ id, onLu }) {
       <header className="fil-entete">
         <strong>{conversation.interlocuteur}</strong>
         <Link to={`/vehicules/${conversation.vehicule.id}`} className="champ-aide">{conversation.vehicule.marque} {conversation.vehicule.modele}</Link>
+        <Signaler key={conversation.interlocuteur_id} cible={{ utilisateur_id: conversation.interlocuteur_id }} libelle="Signaler" />
       </header>
       <div className="fil-messages">
         {conversation.messages.length === 0 && <p className="champ-aide">Écrivez votre premier message.</p>}

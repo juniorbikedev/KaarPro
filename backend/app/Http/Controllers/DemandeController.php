@@ -21,7 +21,7 @@ class DemandeController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $demandes = Demande::where('client_id', $request->user()->id)
-            ->with(['vehicule.photos', 'partenaire', 'contrat', 'paiementReussi'])
+            ->with(['vehicule.photos', 'partenaire', 'contrat', 'paiementReussi', 'etatsDesLieux', 'avis'])
             ->latest()
             ->get();
 

@@ -79,12 +79,17 @@ export default function Espace() {
       {utilisateur.role === 'agent' && (
         <article className="carte">
           <h2>Votre espace agent{utilisateur.zone ? ` — ${utilisateur.zone}` : ''}</h2>
-          <p>Vos missions d'état des lieux et d'inspection apparaîtront ici au sprint 6.</p>
+          <p>Prenez en charge les états des lieux de départ et de retour, et les contrôles avant la remise d'un véhicule vendu.</p>
+          <Link to="/agent/missions" className="bouton">Voir les missions</Link>
         </article>
       )}
 
       {utilisateur.role === 'admin' && (
         <div className="grille-2">
+          <Link to="/admin/tableau-de-bord" className="carte carte-choix">
+            <h2>Tableau de bord</h2>
+            <p>Activité de la plateforme, commissions, éléments à traiter.</p>
+          </Link>
           <Link to="/admin/partenaires" className="carte carte-choix">
             <h2>Valider les partenaires</h2>
             <p>Consulter les inscriptions en attente et leurs documents.</p>
@@ -96,6 +101,10 @@ export default function Espace() {
           <Link to="/admin/paiements" className="carte carte-choix">
             <h2>Suivre les paiements</h2>
             <p>Encaissements, commissions et restitution des cautions.</p>
+          </Link>
+          <Link to="/admin/signalements" className="carte carte-choix">
+            <h2>Traiter les signalements</h2>
+            <p>Annonces et utilisateurs signalés, avis à modérer.</p>
           </Link>
         </div>
       )}

@@ -18,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 /** Cas « Traiter les demandes reçues » : accepter (génère le contrat) ou refuser. */
 class DemandeController extends Controller
 {
-    private const RELATIONS = ['vehicule.photos', 'client', 'partenaire', 'contrat'];
+    private const RELATIONS = ['vehicule.photos', 'client', 'partenaire', 'contrat', 'paiementReussi', 'etatsDesLieux'];
 
     public function index(Request $request): AnonymousResourceCollection
     {

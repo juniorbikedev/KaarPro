@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api, erreurApi } from '../api'
+import { useAuth } from '../auth/AuthContext'
+import AvisVehicule from '../components/AvisVehicule'
 import { SansPhoto } from '../components/CarteVehicule'
 import DemandeVehicule from '../components/DemandeVehicule'
+import Signaler from '../components/Signaler'
 import { BOITES, CARBURANTS, CATEGORIES, ETATS, fcfa } from '../libelles'
 
 /** Cas « Consulter la fiche d'un véhicule ». */
 export default function FicheVehicule() {
   const { id } = useParams()
+  const { utilisateur } = useAuth()
   const [vehicule, setVehicule] = useState(null)
   const [photo, setPhoto] = useState(0)
   const [erreur, setErreur] = useState('')
@@ -20,6 +24,8 @@ export default function FicheVehicule() {
   if (!vehicule) return <p className="chargement">Chargement…</p>
 
   const photos = vehicule.photos ?? []
+  // Tout utilisateur connecté peut signaler une annonce, sauf la sienne
+  const peutSignaler = utilisateur && utilisateur.role !== 'admin' && utilisateur.partenaire?.id !== vehicule.partenaire.id
 
   return (
     <section>
@@ -36,6 +42,7 @@ export default function FicheVehicule() {
               ))}
             </div>
           )}
+          <AvisVehicule vehicule={vehicule} />
         </div>
 
         <div className="fiche-colonne">
@@ -60,6 +67,7 @@ export default function FicheVehicule() {
               <dt>État</dt><dd>{ETATS[vehicule.etat]}</dd>
             </dl>
             {vehicule.description && <p>{vehicule.description}</p>}
+            {peutSignaler && <Signaler cible={{ vehicule_id: vehicule.id }} libelle="Signaler cette annonce" />}
           </div>
           <DemandeVehicule vehicule={vehicule} />
         </div>

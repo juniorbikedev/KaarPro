@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\TypeEtatDesLieux;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -36,6 +37,15 @@ class PaiementResource extends JsonResource
                     ? "{$this->demande->vehicule->marque} {$this->demande->vehicule->modele}"
                     : null,
                 'partenaire' => $this->demande->relationLoaded('partenaire') ? $this->demande->partenaire->nom_commercial : null,
+                // Constat de retour : il conditionne la restitution de la caution et propose la retenue
+                'etat_retour' => $this->demande->relationLoaded('etatsDesLieux')
+                    ? $this->demande->etatsDesLieux->where('type', TypeEtatDesLieux::Retour)->map(fn ($e) => [
+                        'id' => $e->id,
+                        'realise' => $e->estRealise(),
+                        'dommages' => $e->dommages,
+                        'montant_dommages' => $e->montant_dommages,
+                    ])->first()
+                    : null,
             ]),
             'client' => $this->whenLoaded('client', fn () => $this->client->nom),
             'cree_le' => $this->created_at?->toIso8601String(),

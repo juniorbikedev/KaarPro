@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\StatutDemande;
 use App\Enums\StatutPaiement;
 use App\Enums\TypeDemande;
+use App\Enums\TypeEtatDesLieux;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -63,6 +64,25 @@ class Demande extends Model
     public function paiementReussi(): HasOne
     {
         return $this->hasOne(Paiement::class)->where('statut', StatutPaiement::Reussi);
+    }
+
+    public function etatsDesLieux(): HasMany
+    {
+        return $this->hasMany(EtatDesLieux::class);
+    }
+
+    public function avis(): HasOne
+    {
+        return $this->hasOne(Avis::class);
+    }
+
+    /** La transaction est terminée : véhicule loué rendu, ou véhicule vendu remis à l'acheteur. */
+    public function estTerminee(): bool
+    {
+        $dernier = $this->type === TypeDemande::Location ? TypeEtatDesLieux::Retour : TypeEtatDesLieux::Remise;
+
+        return $this->statut === StatutDemande::Payee
+            && $this->etatsDesLieux->contains(fn ($e) => $e->type === $dernier && $e->estRealise());
     }
 
     public function estEnAttente(): bool

@@ -34,6 +34,13 @@ export default function CarteDemande({ demande, pourPartenaire = false, children
           Envoyée le {dateHeure(demande.cree_le)}
           {demande.contrat && <> · <Link to={`/contrats/${demande.contrat.id}`}>Contrat {demande.contrat.numero}</Link>{demande.contrat.signe_client_le ? ' (signé)' : ' (à signer par le client)'}</>}
         </p>
+        {demande.etats_des_lieux?.length > 0 && (
+          <p className="champ-aide liens-constats">
+            {demande.etats_des_lieux.map((e) => e.realise_le
+              ? <Link key={e.id} to={`/etats-des-lieux/${e.id}`}>{e.libelle} ✓</Link>
+              : <span key={e.id}>{e.libelle} : à venir</span>)}
+          </p>
+        )}
         {demande.paiement && (
           <p className="champ-aide">
             Payé {fcfa(demande.paiement.montant_total)} par {demande.paiement.operateur} le {dateHeure(demande.paiement.paye_le)}

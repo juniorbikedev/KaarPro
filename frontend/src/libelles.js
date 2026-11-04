@@ -51,3 +51,12 @@ export function dateHeure(iso) {
 export const OPERATEURS = { wave: 'Wave', orange_money: 'Orange Money' }
 
 export const STATUTS_CAUTION = { bloquee: 'Caution bloquée', restituee: 'Caution restituée' }
+
+export const NIVEAUX_CARBURANT = ['vide', '1/4', '1/2', '3/4', 'plein']
+
+export const MOTIFS_SIGNALEMENT = {
+  annonce_trompeuse: 'Annonce trompeuse',
+  fraude: 'Tentative de fraude',
+  comportement: 'Comportement inapproprié',
+  autre: 'Autre',
+}

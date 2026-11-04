@@ -150,6 +150,10 @@ class PaiementTest extends TestCase
             ->assertOk()
             ->assertJsonPath('totaux.cautions_bloquees', 100_000);
 
+        // La caution ne se restitue qu'après l'état des lieux de retour
+        $this->postJson("/api/admin/paiements/{$reference}/caution", ['caution_retenue' => 0])->assertStatus(422);
+        $demande->etatsDesLieux()->update(['realise_le' => now()]);
+
         $this->postJson("/api/admin/paiements/{$reference}/caution", ['caution_retenue' => 25_000])
             ->assertJsonValidationErrors('motif_retenue');
         $this->postJson("/api/admin/paiements/{$reference}/caution", ['caution_retenue' => 150_000, 'motif_retenue' => 'Rétroviseur'])

@@ -22,6 +22,7 @@ class ConversationResource extends JsonResource
             ],
             // L'interlocuteur : le partenaire pour le client, le client pour le partenaire
             'interlocuteur' => $estClient ? $this->partenaire->nom_commercial : $this->client->nom,
+            'interlocuteur_id' => $estClient ? $this->partenaire->user_id : $this->client_id,
             'dernier_message' => $this->whenLoaded('dernierMessage', fn () => $this->dernierMessage ? [
                 'contenu' => $this->dernierMessage->contenu,
                 'de_moi' => $this->dernierMessage->auteur_id === $moi->id,

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { api, erreurApi } from '../../api'
 import { dateHeure, fcfa } from '../../libelles'
 
@@ -7,9 +8,11 @@ const STATUT = { reussi: ['Réussi', 'statut-valide'], en_attente: ['En attente'
 
 /** Restitution de la caution, avec une retenue éventuelle pour les dommages constatés. */
 function Restitution({ paiement, onFait }) {
+  // La retenue proposée par l'agent au retour sert de point de départ
+  const constat = paiement.demande.etat_retour
   const [ouvert, setOuvert] = useState(false)
-  const [retenue, setRetenue] = useState('0')
-  const [motif, setMotif] = useState('')
+  const [retenue, setRetenue] = useState(String(constat?.montant_dommages ?? 0))
+  const [motif, setMotif] = useState(constat?.dommages ?? '')
   const [erreur, setErreur] = useState('')
 
   async function restituer(e) {
@@ -24,7 +27,15 @@ function Restitution({ paiement, onFait }) {
     }
   }
 
-  if (!ouvert) return <button type="button" className="lien" onClick={() => setOuvert(true)}>Restituer</button>
+  if (constat && !constat.realise) return <span className="champ-aide">En attente de l’état des lieux de retour</span>
+  if (!ouvert) {
+    return (
+      <>
+        {constat && <Link to={`/etats-des-lieux/${constat.id}`} className="champ-aide">Voir le constat de retour</Link>}<br />
+        <button type="button" className="lien" onClick={() => setOuvert(true)}>Restituer</button>
+      </>
+    )
+  }
 
   return (
     <form className="restitution" onSubmit={restituer}>

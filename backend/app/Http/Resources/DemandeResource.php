@@ -56,6 +56,17 @@ class DemandeResource extends JsonResource
                 'caution_retenue' => $this->paiementReussi->caution_retenue,
                 'motif_retenue' => $this->paiementReussi->motif_retenue,
             ] : null),
+            'etats_des_lieux' => $this->whenLoaded('etatsDesLieux', fn () => $this->etatsDesLieux->sortBy('id')->values()->map(fn ($e) => [
+                'id' => $e->id,
+                'type' => $e->type->value,
+                'libelle' => $e->type->libelle(),
+                'realise_le' => $e->realise_le?->toIso8601String(),
+            ])),
+            'avis' => $this->whenLoaded('avis', fn () => $this->avis ? ['note' => $this->avis->note, 'commentaire' => $this->avis->commentaire] : null),
+            'peut_donner_avis' => $this->when(
+                $this->relationLoaded('etatsDesLieux') && $this->relationLoaded('avis'),
+                fn () => $this->avis === null && $this->estTerminee(),
+            ),
             'cree_le' => $this->created_at?->toIso8601String(),
             'repondue_le' => $this->repondue_le?->toIso8601String(),
         ];

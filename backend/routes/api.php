@@ -2,12 +2,17 @@
 
 use App\Http\Controllers\Admin\PaiementController as PaiementAdminController;
 use App\Http\Controllers\Admin\PartenaireController;
+use App\Http\Controllers\Admin\SignalementController as SignalementAdminController;
+use App\Http\Controllers\Admin\TableauDeBordController;
 use App\Http\Controllers\Admin\UtilisateurController;
 use App\Http\Controllers\Auth\InscriptionController;
+use App\Http\Controllers\Agent\MissionController;
 use App\Http\Controllers\Auth\SessionController;
+use App\Http\Controllers\AvisController;
 use App\Http\Controllers\CatalogueController;
 use App\Http\Controllers\ContratController;
 use App\Http\Controllers\DemandeController;
+use App\Http\Controllers\EtatDesLieuxController;
 use App\Http\Controllers\MessagerieController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaiementController;
@@ -16,12 +21,16 @@ use App\Http\Controllers\Partenaire\IndisponibiliteController;
 use App\Http\Controllers\Partenaire\PaiementController as PaiementPartenaireController;
 use App\Http\Controllers\Partenaire\VehiculeController;
 use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\SignalementController;
 use Illuminate\Support\Facades\Route;
 
 // Sprint 3 : catalogue public
 Route::get('vehicules', [CatalogueController::class, 'index']);
 Route::get('vehicules/{vehicule}', [CatalogueController::class, 'show']);
 Route::get('photos/{photo}', [CatalogueController::class, 'photo'])->name('photos.show');
+Route::get('vehicules/{vehicule}/avis', [AvisController::class, 'index']);
+// Sprint 6 : photos d'état des lieux, servies par lien signé et temporaire
+Route::get('etats-des-lieux/photos/{photo}', [EtatDesLieuxController::class, 'photo'])->name('etats-des-lieux.photo')->middleware('signed');
 
 // Sprint 2 : comptes et rôles (client, vendeur/loueur, agent, administrateur)
 
@@ -71,6 +80,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('demandes/{demande}/paiements', [PaiementController::class, 'store'])->middleware('throttle:10,1');
         Route::get('paiements/{paiement}', [PaiementController::class, 'show']);
         Route::post('paiements/{paiement}/simulateur', [PaiementController::class, 'simuler']);
+
+        // Sprint 6 : avis après la transaction
+        Route::post('demandes/{demande}/avis', [AvisController::class, 'store']);
     });
     Route::get('contrats/{contrat}', [ContratController::class, 'show']);
     Route::get('conversations', [MessagerieController::class, 'index']);
@@ -81,6 +93,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('notifications', [NotificationController::class, 'index']);
     Route::post('notifications/tout-lire', [NotificationController::class, 'toutLire']);
     Route::post('notifications/{id}/lire', [NotificationController::class, 'lire']);
+
+    // Sprint 6 : constats consultables par les parties, signalements
+    Route::get('etats-des-lieux/{etatDesLieux}', [EtatDesLieuxController::class, 'show']);
+    Route::post('signalements', [SignalementController::class, 'store'])->middleware('throttle:10,1');
+
+    Route::prefix('agent')->middleware('role:agent')->group(function () {
+        Route::get('missions', [MissionController::class, 'index']);
+        Route::post('missions/{etatDesLieux}/prendre', [MissionController::class, 'prendre']);
+        Route::post('missions/{etatDesLieux}/realiser', [MissionController::class, 'realiser']);
+    });
 
     Route::prefix('admin')->middleware('role:admin')->group(function () {
         Route::get('utilisateurs', [UtilisateurController::class, 'index']);
@@ -95,5 +117,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('paiements', [PaiementAdminController::class, 'index']);
         Route::post('paiements/{paiement}/caution', [PaiementAdminController::class, 'restituerCaution']);
+
+        Route::get('tableau-de-bord', TableauDeBordController::class);
+        Route::get('signalements', [SignalementAdminController::class, 'index']);
+        Route::post('signalements/{signalement}/traiter', [SignalementAdminController::class, 'traiter']);
+        Route::post('avis/{avis}/masquer', [AvisController::class, 'masquer']);
     });
 });

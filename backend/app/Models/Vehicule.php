@@ -62,6 +62,11 @@ class Vehicule extends Model
         return $this->hasMany(Demande::class);
     }
 
+    public function avis(): HasMany
+    {
+        return $this->hasMany(Avis::class);
+    }
+
     public function documents(): MorphMany
     {
         return $this->morphMany(Document::class, 'documentable');

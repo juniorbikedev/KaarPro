@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\StatutPaiement;
+use App\Enums\TypeEtatDesLieux;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PaiementResource;
 use App\Models\Paiement;
@@ -14,7 +15,7 @@ use Illuminate\Validation\Rule;
 /** Cas « Suivre les paiements » et « Restituer la caution » (administrateur). */
 class PaiementController extends Controller
 {
-    private const RELATIONS = ['demande.vehicule', 'demande.partenaire', 'client'];
+    private const RELATIONS = ['demande.vehicule', 'demande.partenaire', 'demande.etatsDesLieux', 'client'];
 
     public function index(Request $request): JsonResponse
     {
@@ -41,6 +42,9 @@ class PaiementController extends Controller
     public function restituerCaution(Request $request, Paiement $paiement): PaiementResource
     {
         abort_unless($paiement->statut_caution === Paiement::CAUTION_BLOQUEE, 422, 'Aucune caution bloquée pour ce paiement.');
+        $retourFait = $paiement->demande->etatsDesLieux()
+            ->where('type', TypeEtatDesLieux::Retour)->whereNotNull('realise_le')->exists();
+        abort_unless($retourFait, 422, "La caution se restitue après l'état des lieux de retour.");
 
         $donnees = $request->validate([
             'caution_retenue' => ['required', 'integer', 'min:0', 'max:'.$paiement->montant_caution],

@@ -6,6 +6,9 @@ import Accueil from './pages/Accueil'
 import Catalogue from './pages/Catalogue'
 import Connexion from './pages/Connexion'
 import Contrat from './pages/Contrat'
+import EtatDesLieux from './pages/EtatDesLieux'
+import Missions from './pages/agent/Missions'
+import RealiserEtatDesLieux from './pages/agent/RealiserEtatDesLieux'
 import Espace from './pages/Espace'
 import FicheVehicule from './pages/FicheVehicule'
 import MesDemandes from './pages/MesDemandes'
@@ -19,6 +22,8 @@ import { ChoixInscription, InscriptionClient, InscriptionPartenaire } from './pa
 import Profil from './pages/Profil'
 import SimulateurPaiement from './pages/SimulateurPaiement'
 import Paiements from './pages/admin/Paiements'
+import Signalements from './pages/admin/Signalements'
+import TableauDeBord from './pages/admin/TableauDeBord'
 import Partenaires from './pages/admin/Partenaires'
 import Utilisateurs from './pages/admin/Utilisateurs'
 
@@ -45,6 +50,11 @@ export default function App() {
             <Route path="paiement/:reference" element={<Protege roles={['client']}><SimulateurPaiement /></Protege>} />
             <Route path="partenaire/paiements" element={<Protege roles={['vendeur']}><Encaissements /></Protege>} />
             <Route path="admin/paiements" element={<Protege roles={['admin']}><Paiements /></Protege>} />
+            <Route path="admin/tableau-de-bord" element={<Protege roles={['admin']}><TableauDeBord /></Protege>} />
+            <Route path="admin/signalements" element={<Protege roles={['admin']}><Signalements /></Protege>} />
+            <Route path="agent/missions" element={<Protege roles={['agent']}><Missions /></Protege>} />
+            <Route path="agent/missions/:id" element={<Protege roles={['agent']}><RealiserEtatDesLieux /></Protege>} />
+            <Route path="etats-des-lieux/:id" element={<Protege><EtatDesLieux /></Protege>} />
             <Route path="contrats/:id" element={<Protege roles={['client', 'vendeur', 'admin']}><Contrat /></Protege>} />
             <Route path="messages" element={<Protege roles={['client', 'vendeur']}><Messagerie /></Protege>} />
             <Route path="messages/:id" element={<Protege roles={['client', 'vendeur']}><Messagerie /></Protege>} />

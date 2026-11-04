@@ -37,11 +37,14 @@ export default function Layout() {
                   <NavLink to="/messages">Messages</NavLink>
                 </>
               )}
+              {utilisateur.role === 'agent' && <NavLink to="/agent/missions">Missions</NavLink>}
               {utilisateur.role === 'admin' && (
                 <>
+                  <NavLink to="/admin/tableau-de-bord">Tableau de bord</NavLink>
                   <NavLink to="/admin/partenaires">Partenaires</NavLink>
                   <NavLink to="/admin/utilisateurs">Utilisateurs</NavLink>
                   <NavLink to="/admin/paiements">Paiements</NavLink>
+                  <NavLink to="/admin/signalements">Signalements</NavLink>
                 </>
               )}
               <NavLink to="/profil">Profil</NavLink>
