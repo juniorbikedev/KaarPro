@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\MissionController as MissionAdminController;
 use App\Http\Controllers\Admin\PaiementController as PaiementAdminController;
 use App\Http\Controllers\Admin\PartenaireController;
 use App\Http\Controllers\Admin\SignalementController as SignalementAdminController;
@@ -125,5 +126,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('signalements', [SignalementAdminController::class, 'index']);
         Route::post('signalements/{signalement}/traiter', [SignalementAdminController::class, 'traiter']);
         Route::post('avis/{avis}/masquer', [AvisController::class, 'masquer']);
+
+        // Missions d'état des lieux confiées aux agents
+        Route::get('missions', [MissionAdminController::class, 'index']);
+        Route::post('missions/{etatDesLieux}/attribuer', [MissionAdminController::class, 'attribuer']);
     });
 });

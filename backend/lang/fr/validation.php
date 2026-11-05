@@ -96,5 +96,7 @@ return [
         'decision' => 'décision',
         'vehicule_id' => 'annonce',
         'utilisateur_id' => 'utilisateur',
+        'agent_id' => 'agent',
+        'consigne' => 'consigne',
     ],
 ];

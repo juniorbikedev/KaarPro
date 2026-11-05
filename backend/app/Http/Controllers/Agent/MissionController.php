@@ -45,7 +45,7 @@ class MissionController extends Controller
     {
         abort_if($etatDesLieux->agent_id !== null, 422, 'Cette mission est déjà prise par un agent.');
 
-        $etatDesLieux->update(['agent_id' => $request->user()->id]);
+        $etatDesLieux->update(['agent_id' => $request->user()->id, 'attribuee_par' => $request->user()->id, 'attribuee_le' => now()]);
 
         return new EtatDesLieuxResource($etatDesLieux->load(self::RELATIONS));
     }

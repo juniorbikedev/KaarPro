@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Role;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -51,6 +52,12 @@ class User extends Authenticatable
     public function partenaire(): HasOne
     {
         return $this->hasOne(Partenaire::class);
+    }
+
+    /** Missions d'état des lieux confiées à cet utilisateur (agent). */
+    public function missions(): HasMany
+    {
+        return $this->hasMany(EtatDesLieux::class, 'agent_id');
     }
 
     public function aLeRole(Role ...$roles): bool

@@ -183,6 +183,8 @@ l'agent pré-remplit le formulaire de l'administrateur. Les photos des constats 
 
 | Méthode | Route | Rôle |
 |---|---|---|
+| GET | `/api/admin/missions?statut=a_attribuer\|a_faire\|realise` (missions et agents disponibles) | admin |
+| POST | `/api/admin/missions/{id}/attribuer` (`agent_id`, `consigne`) — confie ou réattribue une mission, l'agent est notifié | admin |
 | GET | `/api/agent/missions?filtre=disponibles\|miennes\|realisees` | agent |
 | POST | `/api/agent/missions/{id}/prendre`, `/realiser` (multipart : `kilometrage`, `niveau_carburant`, `observations`, `dommages`, `montant_dommages`, `photos[]`) | agent |
 | GET | `/api/etats-des-lieux/{id}` | client, partenaire concerné, agent, admin |

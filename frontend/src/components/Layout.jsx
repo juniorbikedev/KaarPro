@@ -44,6 +44,7 @@ export default function Layout() {
                   <NavLink to="/admin/partenaires">Partenaires</NavLink>
                   <NavLink to="/admin/utilisateurs">Utilisateurs</NavLink>
                   <NavLink to="/admin/paiements">Paiements</NavLink>
+                  <NavLink to="/admin/missions">Missions</NavLink>
                   <NavLink to="/admin/signalements">Signalements</NavLink>
                 </>
               )}

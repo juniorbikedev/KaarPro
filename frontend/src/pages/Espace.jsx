@@ -102,6 +102,10 @@ export default function Espace() {
             <h2>Suivre les paiements</h2>
             <p>Encaissements, commissions et restitution des cautions.</p>
           </Link>
+          <Link to="/admin/missions" className="carte carte-choix">
+            <h2>Confier les missions</h2>
+            <p>Attribuer les états des lieux aux agents, avec une consigne.</p>
+          </Link>
           <Link to="/admin/signalements" className="carte carte-choix">
             <h2>Traiter les signalements</h2>
             <p>Annonces et utilisateurs signalés, avis à modérer.</p>

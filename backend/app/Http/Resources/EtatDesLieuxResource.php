@@ -21,6 +21,10 @@ class EtatDesLieuxResource extends JsonResource
             'libelle' => $this->type->libelle(),
             'statut' => $this->estRealise() ? 'realise' : ($this->agent_id ? 'a_faire' : 'a_attribuer'),
             'agent' => $this->agent ? ['id' => $this->agent->id, 'nom' => $this->agent->nom] : null,
+            'consigne' => $this->consigne,
+            // Mission confiée par l'administrateur (sinon prise par l'agent lui-même)
+            'confiee_par_admin' => $this->attribuee_par !== null && $this->attribuee_par !== $this->agent_id,
+            'attribuee_le' => $this->attribuee_le?->toIso8601String(),
             'kilometrage' => $this->kilometrage,
             'niveau_carburant' => $this->niveau_carburant,
             'observations' => $this->observations,

@@ -31,7 +31,7 @@ export default function TableauDeBord() {
       <div className="grille-chiffres">
         <Chiffre libelle="Partenaires à valider" valeur={aTraiter.partenaires_a_valider} lien="/admin/partenaires" />
         <Chiffre libelle="Signalements ouverts" valeur={aTraiter.signalements_ouverts} lien="/admin/signalements" />
-        <Chiffre libelle="Missions sans agent" valeur={aTraiter.missions_a_attribuer} />
+        <Chiffre libelle="Missions sans agent" valeur={aTraiter.missions_a_attribuer} lien="/admin/missions" />
         <Chiffre libelle="Cautions bloquées" valeur={fcfa(finances.cautions_bloquees)} lien="/admin/paiements" />
       </div>
 

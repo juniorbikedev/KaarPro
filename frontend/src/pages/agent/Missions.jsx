@@ -58,6 +58,8 @@ export default function Missions() {
                 <p className="carte-demande-titre"><strong>{m.libelle}</strong> · {d.vehicule.marque} {d.vehicule.modele} <span className="champ-aide">{d.vehicule.immatriculation} · {d.vehicule.ville}</span></p>
                 <p>{quand(m)}</p>
                 <p className="champ-aide">Client : {d.client.nom} · {d.client.telephone ?? '—'} — Partenaire : {d.partenaire.nom_commercial} · {d.partenaire.telephone ?? '—'}</p>
+                {m.confiee_par_admin && <p className="champ-aide"><span className="statut statut-valide">Confiée par l’administrateur</span></p>}
+                {m.consigne && <blockquote className="citation">Consigne : {m.consigne}</blockquote>}
                 {m.type === 'retour' && !m.depart_realise && <p className="champ-aide">En attente de l’état des lieux de départ.</p>}
                 {m.realise_le && <p className="champ-aide">Réalisé le {dateHeure(m.realise_le)}</p>}
               </div>

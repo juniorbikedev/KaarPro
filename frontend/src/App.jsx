@@ -21,6 +21,7 @@ import MesVehicules from './pages/partenaire/MesVehicules'
 import { ChoixInscription, InscriptionClient, InscriptionPartenaire } from './pages/Inscription'
 import Profil from './pages/Profil'
 import PagePaiement from './pages/PagePaiement'
+import MissionsAdmin from './pages/admin/Missions'
 import Paiements from './pages/admin/Paiements'
 import Signalements from './pages/admin/Signalements'
 import TableauDeBord from './pages/admin/TableauDeBord'
@@ -52,6 +53,7 @@ export default function App() {
             <Route path="admin/paiements" element={<Protege roles={['admin']}><Paiements /></Protege>} />
             <Route path="admin/tableau-de-bord" element={<Protege roles={['admin']}><TableauDeBord /></Protege>} />
             <Route path="admin/signalements" element={<Protege roles={['admin']}><Signalements /></Protege>} />
+            <Route path="admin/missions" element={<Protege roles={['admin']}><MissionsAdmin /></Protege>} />
             <Route path="agent/missions" element={<Protege roles={['agent']}><Missions /></Protege>} />
             <Route path="agent/missions/:id" element={<Protege roles={['agent']}><RealiserEtatDesLieux /></Protege>} />
             <Route path="etats-des-lieux/:id" element={<Protege><EtatDesLieux /></Protege>} />

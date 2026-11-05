@@ -279,6 +279,10 @@ button.etoile { font-size: 1.6rem; cursor: pointer; }
 .repartition strong { text-align: right; }
 .classement { margin: 0; padding-left: 1.2rem; display: grid; gap: .35rem; }
 
+/* Attribution des missions par l'administrateur */
+.attribution { display: grid; gap: .45rem; min-width: 240px; max-width: 320px; }
+.mission p { margin: 0; }
+
 @media print {
   .entete, .pied, .sans-impression { display: none !important; }
   body, .page { background: var(--blanc); }
