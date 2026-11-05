@@ -35,6 +35,7 @@ Route::get('vehicules/{vehicule}/avis', [AvisController::class, 'index']);
 Route::post('webhooks/paytech', PaytechController::class)->name('webhooks.paytech')->middleware('throttle:60,1');
 // Sprint 6 : photos d'état des lieux, servies par lien signé et temporaire
 Route::get('etats-des-lieux/photos/{photo}', [EtatDesLieuxController::class, 'photo'])->name('etats-des-lieux.photo')->middleware('signed');
+Route::get('documents/{document}/fichier-signe', [EtatDesLieuxController::class, 'document'])->name('documents.signe')->middleware('signed');
 
 // Sprint 2 : comptes et rôles (client, vendeur/loueur, agent, administrateur)
 
@@ -130,5 +131,6 @@ Route::middleware('auth:sanctum')->group(function () {
         // Missions d'état des lieux confiées aux agents
         Route::get('missions', [MissionAdminController::class, 'index']);
         Route::post('missions/{etatDesLieux}/attribuer', [MissionAdminController::class, 'attribuer']);
+        Route::post('vehicules/{vehicule}/inspection', [MissionAdminController::class, 'demanderInspection']);
     });
 });

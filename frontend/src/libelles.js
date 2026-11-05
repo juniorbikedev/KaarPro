@@ -60,3 +60,12 @@ export const MOTIFS_SIGNALEMENT = {
   comportement: 'Comportement inapproprié',
   autre: 'Autre',
 }
+
+/** Date utile d'une mission d'agent : départ ou remise au début de la période, retour à la fin. */
+export function echeanceMission(mission) {
+  const d = mission.demande
+  if (mission.type === 'inspection') return 'Véhicule publié, à comparer à ses documents'
+  if (mission.type === 'retour') return d?.date_fin ? `Retour prévu le ${dateLisible(d.date_fin)}` : ''
+  if (mission.type === 'depart') return d?.date_debut ? `Départ prévu le ${dateLisible(d.date_debut)}` : ''
+  return 'Remise après la vente'
+}

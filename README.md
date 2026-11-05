@@ -178,15 +178,21 @@ La commission est réglée par `COMMISSION_LOCATION` et `COMMISSION_VENTE` (en %
 ## API du sprint 6
 
 Le paiement crée les missions : état des lieux de départ et de retour pour une location, contrôle avant remise pour
-une vente. La caution d'une location ne se restitue qu'après l'état des lieux de retour ; la retenue proposée par
-l'agent pré-remplit le formulaire de l'administrateur. Les photos des constats sont privées et servies par lien signé.
+une vente. Au retour, l'agent voit le constat de départ pour comparer, puis **statue sur la caution** : restitution
+entière, ou retenue motivée par les dommages constatés (le client est prévenu aussitôt).
+
+La publication d'un véhicule crée une **inspection** (l'administrateur peut aussi en demander une) : l'agent compare
+le véhicule à sa carte grise, son assurance et son annonce. Conforme, l'annonce reçoit le badge « Vérifié par un
+agent » ; non conforme, un signalement est transmis à l'administrateur. Les photos et les documents sont privés et
+servis par lien signé et temporaire.
 
 | Méthode | Route | Rôle |
 |---|---|---|
 | GET | `/api/admin/missions?statut=a_attribuer\|a_faire\|realise` (missions et agents disponibles) | admin |
 | POST | `/api/admin/missions/{id}/attribuer` (`agent_id`, `consigne`) — confie ou réattribue une mission, l'agent est notifié | admin |
 | GET | `/api/agent/missions?filtre=disponibles\|miennes\|realisees` | agent |
-| POST | `/api/agent/missions/{id}/prendre`, `/realiser` (multipart : `kilometrage`, `niveau_carburant`, `observations`, `dommages`, `montant_dommages`, `photos[]`) | agent |
+| POST | `/api/agent/missions/{id}/prendre`, `/realiser` (multipart : `kilometrage`, `niveau_carburant`, `observations`, `dommages`, `photos[]` ; au retour `decision_caution` = restituer \| retenir et `montant_dommages` ; pour une inspection `points_controle[immatriculation\|carte_grise\|assurance\|annonce]`) | agent |
+| POST | `/api/admin/vehicules/{id}/inspection` (`agent_id`, `consigne`) — demande l'inspection d'un véhicule publié | admin |
 | GET | `/api/etats-des-lieux/{id}` | client, partenaire concerné, agent, admin |
 | GET | `/api/vehicules/{id}/avis` ; POST `/api/demandes/{id}/avis` (`note`, `commentaire`) | public ; client |
 | POST | `/api/signalements` (`vehicule_id` ou `utilisateur_id`, `motif`, `description`) | connecté |

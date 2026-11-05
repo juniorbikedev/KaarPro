@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Agent\MissionController;
 use App\Http\Resources\EtatDesLieuxResource;
+use App\Models\Document;
 use App\Models\EtatDesLieux;
 use App\Models\PhotoEtatDesLieux;
 use Illuminate\Http\Request;
@@ -27,5 +28,13 @@ class EtatDesLieuxController extends Controller
         abort_unless(Storage::disk('local')->exists($photo->chemin), 404);
 
         return Storage::disk('local')->response($photo->chemin, null, ['Cache-Control' => 'private, max-age=3600']);
+    }
+
+    /** Carte grise ou assurance consultée par l'agent pendant l'inspection, par lien signé et temporaire. */
+    public function document(Document $document): StreamedResponse
+    {
+        abort_unless(Storage::disk('local')->exists($document->chemin), 404);
+
+        return Storage::disk('local')->response($document->chemin, $document->nom_original, ['Cache-Control' => 'private, max-age=3600']);
     }
 }

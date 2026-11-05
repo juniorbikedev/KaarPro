@@ -283,6 +283,21 @@ button.etoile { font-size: 1.6rem; cursor: pointer; }
 .attribution { display: grid; gap: .45rem; min-width: 240px; max-width: 320px; }
 .mission p { margin: 0; }
 
+/* Missions de l'agent : comparaison départ/retour, caution, inspection */
+.pastille-verifie { background: #e8f6ee; color: var(--vert); }
+.realisation { align-items: start; }
+.constat-depart { background: var(--fond); }
+.constat .grille-2 { align-items: start; }
+.constat h3 { font-size: .95rem; margin: .75rem 0 .4rem; color: var(--gris); }
+.points-controle, .decision-caution { border: 1px solid var(--bord); border-radius: 10px; padding: .75rem; margin: 0; display: grid; gap: .55rem; }
+.point-controle { display: grid; gap: .3rem; padding-bottom: .5rem; border-bottom: 1px dashed var(--bord); }
+.point-controle:last-of-type { border-bottom: 0; padding-bottom: 0; }
+.choix-oui-non { display: flex; flex-wrap: wrap; gap: 1rem; }
+.choix-oui-non label { display: flex; align-items: center; gap: .35rem; cursor: pointer; }
+.points-resultat { list-style: none; padding: 0; margin: 0; display: grid; gap: .3rem; }
+.points-resultat .ok { color: var(--vert); }
+.points-resultat .ko { color: var(--rouge); font-weight: 600; }
+
 @media print {
   .entete, .pied, .sans-impression { display: none !important; }
   body, .page { background: var(--blanc); }

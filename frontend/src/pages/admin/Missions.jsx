@@ -1,18 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, erreurApi } from '../../api'
-import { dateHeure, dateLisible } from '../../libelles'
+import { dateHeure, echeanceMission } from '../../libelles'
 
 const FILTRES = { a_attribuer: 'À attribuer', a_faire: 'En cours', realise: 'Réalisées', '': 'Toutes' }
 const STATUT = { a_attribuer: ['À attribuer', 'statut-attente'], a_faire: ['Confiée', 'statut-valide'], realise: ['Réalisée', 'statut-annule'] }
 
-/** Date utile de la mission : départ ou remise au début de la période, retour à la fin. */
-function quand(mission) {
-  const d = mission.demande
-  if (mission.type === 'retour') return d.date_fin ? `Retour prévu le ${dateLisible(d.date_fin)}` : ''
-  if (mission.type === 'depart') return d.date_debut ? `Départ prévu le ${dateLisible(d.date_debut)}` : ''
-  return 'Remise après la vente'
-}
 
 /** Choix de l'agent et consigne ; sert aussi à réattribuer une mission en cours. */
 function Attribution({ mission, agents, onFait }) {
@@ -75,7 +68,7 @@ export default function Missions() {
   return (
     <section>
       <h1>Missions des agents</h1>
-      <p className="intro">États des lieux de départ et de retour, contrôles avant la remise d’un véhicule vendu.</p>
+      <p className="intro">États des lieux de départ et de retour, contrôles avant la remise d’un véhicule vendu, inspections des véhicules publiés.</p>
       <div className="onglets">
         {Object.entries(FILTRES).map(([valeur, libelle]) => (
           <button key={valeur} type="button" className={filtre === valeur ? 'onglet onglet-actif' : 'onglet'} onClick={() => { setReponse(null); setFiltre(valeur) }}>{libelle}</button>
@@ -96,11 +89,14 @@ export default function Missions() {
               <div className="ligne-vehicule-infos">
                 <p className="carte-demande-titre">
                   <span className={`statut ${classe}`}>{libelle}</span>
-                  <strong>{m.libelle}</strong> · {d.vehicule.marque} {d.vehicule.modele}
-                  <span className="champ-aide">{d.vehicule.immatriculation} · {d.vehicule.ville}</span>
+                  <strong>{m.libelle}</strong> · {m.vehicule.marque} {m.vehicule.modele}
+                  <span className="champ-aide">{m.vehicule.immatriculation} · {m.vehicule.ville}</span>
                 </p>
-                <p>{quand(m)}</p>
-                <p className="champ-aide">Client : {d.client.nom} · Partenaire : {d.partenaire.nom_commercial}</p>
+                <p>{echeanceMission(m)}</p>
+                <p className="champ-aide">{d && <>Client : {d.client.nom} · </>}Partenaire : {m.partenaire.nom_commercial}</p>
+                {m.type === 'inspection' && m.statut === 'realise' && (
+                  <p><span className={`statut ${m.conforme ? 'statut-valide' : 'statut-refuse'}`}>{m.conforme ? 'Conforme' : 'Non conforme'}</span></p>
+                )}
                 {m.agent && (
                   <p className="champ-aide">
                     Agent : <strong>{m.agent.nom}</strong>

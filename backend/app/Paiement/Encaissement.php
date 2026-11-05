@@ -81,7 +81,7 @@ class Encaissement
                 ? [TypeEtatDesLieux::Depart, TypeEtatDesLieux::Retour]
                 : [TypeEtatDesLieux::Remise];
             foreach ($types as $type) {
-                $demande->etatsDesLieux()->create(['type' => $type]);
+                $demande->etatsDesLieux()->create(['type' => $type, 'vehicule_id' => $demande->vehicule_id]);
             }
 
             // Une vente payée retire le véhicule du catalogue et clôt les autres demandes

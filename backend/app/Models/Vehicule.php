@@ -24,7 +24,7 @@ class Vehicule extends Model
     protected $fillable = [
         'immatriculation', 'marque', 'modele', 'annee', 'categorie', 'carburant', 'boite', 'places',
         'kilometrage', 'ville', 'description', 'mode_offre', 'prix_jour', 'prix_vente', 'montant_caution',
-        'etat', 'statut_publication',
+        'etat', 'statut_publication', 'verifie_le',
     ];
 
     protected function casts(): array
@@ -39,6 +39,7 @@ class Vehicule extends Model
             'prix_jour' => 'integer',
             'prix_vente' => 'integer',
             'montant_caution' => 'integer',
+            'verifie_le' => 'datetime',
         ];
     }
 
@@ -60,6 +61,12 @@ class Vehicule extends Model
     public function demandes(): HasMany
     {
         return $this->hasMany(Demande::class);
+    }
+
+    /** Missions des agents : états des lieux des locations et inspections du véhicule. */
+    public function etatsDesLieux(): HasMany
+    {
+        return $this->hasMany(EtatDesLieux::class);
     }
 
     public function avis(): HasMany

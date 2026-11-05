@@ -7,7 +7,7 @@ use App\Enums\TypeEtatDesLieux;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PaiementResource;
 use App\Models\Paiement;
-use App\Notifications\Alerte;
+use App\Paiement\Caution;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -38,8 +38,11 @@ class PaiementController extends Controller
         ]);
     }
 
-    /** Restitue la caution au client, en retenant éventuellement une somme pour les dommages constatés. */
-    public function restituerCaution(Request $request, Paiement $paiement): PaiementResource
+    /**
+     * Restitue la caution au client, en retenant éventuellement une somme pour les dommages constatés.
+     * D'ordinaire, l'agent statue au retour du véhicule ; l'administrateur intervient si ce n'est pas fait.
+     */
+    public function restituerCaution(Request $request, Paiement $paiement, Caution $caution): PaiementResource
     {
         abort_unless($paiement->statut_caution === Paiement::CAUTION_BLOQUEE, 422, 'Aucune caution bloquée pour ce paiement.');
         $retourFait = $paiement->demande->etatsDesLieux()
@@ -51,17 +54,7 @@ class PaiementController extends Controller
             'motif_retenue' => ['required_unless:caution_retenue,0', 'nullable', 'string', 'max:255'],
         ]);
 
-        $paiement->update([
-            'statut_caution' => Paiement::CAUTION_RESTITUEE,
-            'caution_retenue' => $donnees['caution_retenue'],
-            'motif_retenue' => $donnees['caution_retenue'] > 0 ? $donnees['motif_retenue'] : null,
-            'caution_traitee_le' => now(),
-        ]);
-
-        $rendu = number_format($paiement->montant_caution - $paiement->caution_retenue, 0, ',', ' ');
-        $retenue = $paiement->motif_retenue ? " (retenue : {$paiement->motif_retenue})" : '';
-        $paiement->client->notify(new Alerte('caution', 'Caution restituée',
-            "{$rendu} FCFA de votre caution vous sont restitués{$retenue}.", '/demandes'));
+        $caution->statuer($paiement, $donnees['caution_retenue'], $donnees['motif_retenue'] ?? null);
 
         return new PaiementResource($paiement->load(self::RELATIONS));
     }

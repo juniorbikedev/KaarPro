@@ -24,6 +24,7 @@ export default function CarteVehicule({ vehicule, lien }) {
         <div className="pastilles">
           {vehicule.a_louer && <span className="pastille pastille-location">À louer</span>}
           {vehicule.a_vendre && <span className="pastille pastille-vente">À vendre</span>}
+          {vehicule.verifie_le && <span className="pastille pastille-verifie" title="Le véhicule correspond à ses documents">✓ Vérifié par un agent</span>}
         </div>
         <h2>{vehicule.marque} {vehicule.modele}</h2>
         <p className="champ-aide">{vehicule.annee} · {CATEGORIES[vehicule.categorie]} · {vehicule.ville}</p>

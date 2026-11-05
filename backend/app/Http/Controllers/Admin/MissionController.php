@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\EtatDesLieuxResource;
 use App\Models\EtatDesLieux;
 use App\Models\User;
+use App\Models\Vehicule;
+use App\Missions\Inspections;
 use App\Notifications\Alerte;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -29,8 +31,7 @@ class MissionController extends Controller
                 'realise' => $q->whereNotNull('realise_le'),
             })
             ->get()
-            // Les missions les plus proches dans le temps d'abord
-            ->sortBy(fn ($e) => ($e->type === TypeEtatDesLieux::Retour ? $e->demande->date_fin : $e->demande->date_debut)?->timestamp ?? $e->created_at->timestamp)
+            ->sortBy(fn (EtatDesLieux $e) => MissionAgentController::echeance($e))
             ->values();
 
         // Agents disponibles, avec leur zone et leur charge actuelle pour choisir à qui confier la mission
@@ -44,6 +45,26 @@ class MissionController extends Controller
             'data' => EtatDesLieuxResource::collection($missions),
             'agents' => $agents,
         ]);
+    }
+
+    /** Demande l'inspection d'un véhicule publié, confiée tout de suite à un agent ou proposée à tous. */
+    public function demanderInspection(Request $request, Vehicule $vehicule, Inspections $inspections): JsonResponse
+    {
+        $donnees = $request->validate([
+            'agent_id' => ['nullable', 'integer', Rule::exists('users', 'id')->where('role', Role::Agent->value)->where('est_actif', true)],
+            'consigne' => ['nullable', 'string', 'max:1000'],
+        ]);
+        $dejaPrevue = $vehicule->etatsDesLieux()->where('type', TypeEtatDesLieux::Inspection)->whereNull('realise_le')->exists();
+        abort_if($dejaPrevue, 422, 'Une inspection de ce véhicule est déjà prévue.');
+
+        $inspection = $inspections->demander(
+            $vehicule,
+            isset($donnees['agent_id']) ? User::find($donnees['agent_id']) : null,
+            $donnees['consigne'] ?? null,
+            $request->user(),
+        );
+
+        return (new EtatDesLieuxResource($inspection->load(MissionAgentController::RELATIONS)))->response()->setStatusCode(201);
     }
 
     /** Confie (ou réattribue) une mission non réalisée à un agent actif, avec une consigne éventuelle. */
@@ -65,7 +86,7 @@ class MissionController extends Controller
         ]);
         $etatDesLieux->load(MissionAgentController::RELATIONS);
 
-        $vehicule = $etatDesLieux->demande->vehicule;
+        $vehicule = $etatDesLieux->vehicule;
         $objet = "{$etatDesLieux->type->libelle()} du {$vehicule->marque} {$vehicule->modele} ({$vehicule->ville})";
         $etatDesLieux->agent->notify(new Alerte('mission', 'Mission confiée',
             "L'administrateur vous confie : {$objet}.".($etatDesLieux->consigne ? " Consigne : {$etatDesLieux->consigne}" : ''),

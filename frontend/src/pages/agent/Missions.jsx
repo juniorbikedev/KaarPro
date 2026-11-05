@@ -1,17 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, erreurApi } from '../../api'
-import { dateHeure, dateLisible } from '../../libelles'
+import { dateHeure, echeanceMission } from '../../libelles'
 
 const FILTRES = { disponibles: 'À attribuer', miennes: 'Mes missions', realisees: 'Réalisées' }
 
-/** Date utile de la mission : départ ou remise au début de la période, retour à la fin. */
-function quand(mission) {
-  const d = mission.demande
-  if (mission.type === 'retour') return d.date_fin ? `Retour prévu le ${dateLisible(d.date_fin)}` : ''
-  if (mission.type === 'depart') return d.date_debut ? `Départ prévu le ${dateLisible(d.date_debut)}` : ''
-  return 'Remise après la vente'
-}
 
 /** Cas « Réaliser un état des lieux » : liste des missions de l'agent. */
 export default function Missions() {
@@ -40,7 +33,8 @@ export default function Missions() {
 
   return (
     <section>
-      <h1>Missions d’état des lieux</h1>
+      <h1>Mes missions</h1>
+      <p className="intro">États des lieux de départ et de retour, contrôles avant remise, inspections des véhicules publiés.</p>
       <div className="onglets">
         {Object.entries(FILTRES).map(([valeur, libelle]) => (
           <button key={valeur} type="button" className={filtre === valeur ? 'onglet onglet-actif' : 'onglet'} onClick={() => { setMissions(null); setFiltre(valeur) }}>{libelle}</button>
@@ -55,9 +49,14 @@ export default function Missions() {
           return (
             <article key={m.id} className="carte ligne-vehicule">
               <div className="ligne-vehicule-infos">
-                <p className="carte-demande-titre"><strong>{m.libelle}</strong> · {d.vehicule.marque} {d.vehicule.modele} <span className="champ-aide">{d.vehicule.immatriculation} · {d.vehicule.ville}</span></p>
-                <p>{quand(m)}</p>
-                <p className="champ-aide">Client : {d.client.nom} · {d.client.telephone ?? '—'} — Partenaire : {d.partenaire.nom_commercial} · {d.partenaire.telephone ?? '—'}</p>
+                <p className="carte-demande-titre"><strong>{m.libelle}</strong> · {m.vehicule.marque} {m.vehicule.modele} <span className="champ-aide">{m.vehicule.immatriculation} · {m.vehicule.ville}</span></p>
+                <p>{echeanceMission(m)}</p>
+                <p className="champ-aide">
+                  {d && <>Client : {d.client.nom} · {d.client.telephone ?? '—'} — </>}Partenaire : {m.partenaire.nom_commercial} · {m.partenaire.telephone ?? '—'}
+                </p>
+                {m.type === 'inspection' && m.statut === 'realise' && (
+                  <p><span className={`statut ${m.conforme ? 'statut-valide' : 'statut-refuse'}`}>{m.conforme ? 'Conforme' : 'Non conforme'}</span></p>
+                )}
                 {m.confiee_par_admin && <p className="champ-aide"><span className="statut statut-valide">Confiée par l’administrateur</span></p>}
                 {m.consigne && <blockquote className="citation">Consigne : {m.consigne}</blockquote>}
                 {m.type === 'retour' && !m.depart_realise && <p className="champ-aide">En attente de l’état des lieux de départ.</p>}
@@ -65,7 +64,7 @@ export default function Missions() {
               </div>
               <div className="ligne-vehicule-actions">
                 {m.statut === 'a_attribuer' && <button type="button" className="bouton" onClick={() => prendre(m)}>Je m’en charge</button>}
-                {m.statut === 'a_faire' && m.depart_realise && <Link to={`/agent/missions/${m.id}`} className="bouton">Réaliser</Link>}
+                {m.statut === 'a_faire' && m.depart_realise && <Link to={`/agent/missions/${m.id}`} className="bouton">{m.type === 'inspection' ? 'Inspecter' : 'Réaliser'}</Link>}
                 {m.statut === 'realise' && <Link to={`/etats-des-lieux/${m.id}`} className="bouton bouton-discret">Voir le constat</Link>}
               </div>
             </article>

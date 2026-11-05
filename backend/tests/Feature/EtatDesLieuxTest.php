@@ -71,17 +71,52 @@ class EtatDesLieuxTest extends TestCase
             ->assertJsonCount(2, 'data.photos');
         $this->assertSame(EtatVehicule::EnLocation, $vehicule->refresh()->etat);
 
+        // Le retour présente le constat de départ, pour comparer
+        $this->getJson("/api/etats-des-lieux/{$retour->id}")
+            ->assertJsonPath('data.depart.kilometrage', $vehicule->kilometrage)
+            ->assertJsonCount(2, 'data.depart.photos')
+            ->assertJsonPath('data.caution.statut', 'bloquee');
+
+        // L'agent doit statuer sur la caution, et motiver une retenue
+        $this->post("/api/agent/missions/{$retour->id}/realiser", $this->constat($vehicule->kilometrage + 640), ['Accept' => 'application/json'])
+            ->assertJsonValidationErrors('decision_caution');
+        $this->post("/api/agent/missions/{$retour->id}/realiser", $this->constat($vehicule->kilometrage + 640, ['decision_caution' => 'retenir']), ['Accept' => 'application/json'])
+            ->assertJsonValidationErrors(['dommages', 'montant_dommages']);
+        $this->post("/api/agent/missions/{$retour->id}/realiser", $this->constat($vehicule->kilometrage - 5), ['Accept' => 'application/json'])
+            ->assertJsonValidationErrors('kilometrage');
+
         $this->post("/api/agent/missions/{$retour->id}/realiser", $this->constat($vehicule->kilometrage + 640, [
             'dommages' => 'Rayure sur la portière arrière gauche.',
+            'decision_caution' => 'retenir',
             'montant_dommages' => 30_000,
         ]), ['Accept' => 'application/json'])
             ->assertOk()
-            ->assertJsonPath('data.montant_dommages', 30_000);
+            ->assertJsonPath('data.montant_dommages', 30_000)
+            ->assertJsonPath('data.caution.statut', 'restituee')
+            ->assertJsonPath('data.caution.retenue', 30_000);
 
         $vehicule->refresh();
         $this->assertSame(EtatVehicule::Disponible, $vehicule->etat);
         $this->assertSame($retour->refresh()->kilometrage, $vehicule->kilometrage);
-        $this->assertTrue($demande->client->notifications->pluck('data.titre')->contains('État des lieux de retour'));
+        $titres = $demande->client->notifications->pluck('data.titre');
+        $this->assertTrue($titres->contains('État des lieux de retour'));
+        $this->assertTrue($titres->contains('Caution restituée'));
+    }
+
+    public function test_sans_dommage_l_agent_restitue_toute_la_caution(): void
+    {
+        $agent = User::factory()->role(Role::Agent)->create();
+        $demande = $this->demandePayee(['montant_caution' => 100_000]);
+        [$depart, $retour] = $demande->etatsDesLieux()->orderBy('id')->get();
+        $depart->update(['agent_id' => $agent->id, 'kilometrage' => 50_000, 'niveau_carburant' => 'plein', 'realise_le' => now()]);
+        $retour->update(['agent_id' => $agent->id]);
+
+        $this->actingAs($agent)->post("/api/agent/missions/{$retour->id}/realiser", $this->constat(50_300, ['decision_caution' => 'restituer']), ['Accept' => 'application/json'])
+            ->assertOk()
+            ->assertJsonPath('data.caution.retenue', 0)
+            ->assertJsonPath('data.montant_dommages', 0);
+
+        $this->assertSame('restituee', $demande->paiementReussi->statut_caution);
     }
 
     public function test_une_mission_prise_par_un_agent_n_est_pas_modifiable_par_un_autre(): void

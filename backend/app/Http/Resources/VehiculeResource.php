@@ -31,6 +31,8 @@ class VehiculeResource extends JsonResource
             'montant_caution' => $this->montant_caution,
             'etat' => $this->etat->value,
             'statut_publication' => $this->statut_publication,
+            // Date de la dernière inspection conforme par un agent
+            'verifie_le' => $this->verifie_le?->toIso8601String(),
             'photos' => $this->whenLoaded('photos', fn () => $this->photos->map(fn ($photo) => [
                 'id' => $photo->id,
                 'url' => route('photos.show', $photo),

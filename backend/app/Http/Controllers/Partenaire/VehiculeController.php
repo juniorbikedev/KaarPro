@@ -8,6 +8,7 @@ use App\Enums\TypeActivite;
 use App\Enums\TypeDocument;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\VehiculeResource;
+use App\Missions\Inspections;
 use App\Models\Partenaire;
 use App\Models\PhotoVehicule;
 use App\Models\Vehicule;
@@ -38,7 +39,7 @@ class VehiculeController extends Controller
     }
 
     /** « Publier un véhicule » : caractéristiques, prix, photos, carte grise et assurance. */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, Inspections $inspections): JsonResponse
     {
         $partenaire = $this->partenaire($request);
         $donnees = $request->validate([
@@ -64,6 +65,9 @@ class VehiculeController extends Controller
 
             return $vehicule;
         });
+
+        // Un agent vérifiera que le véhicule correspond à ses documents
+        $inspections->demander($vehicule);
 
         // refresh() récupère les valeurs par défaut posées par la base (état, statut de publication)
         return (new VehiculeResource($vehicule->refresh()->load('photos', 'documents')))->response()->setStatusCode(201);

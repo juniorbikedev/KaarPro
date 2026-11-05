@@ -4,6 +4,7 @@ import { api, erreurApi } from '../api'
 import { useAuth } from '../auth/AuthContext'
 import AvisVehicule from '../components/AvisVehicule'
 import { SansPhoto } from '../components/CarteVehicule'
+import DemanderInspection from '../components/DemanderInspection'
 import DemandeVehicule from '../components/DemandeVehicule'
 import Signaler from '../components/Signaler'
 import { BOITES, CARBURANTS, CATEGORIES, ETATS, fcfa } from '../libelles'
@@ -50,6 +51,7 @@ export default function FicheVehicule() {
             <div className="pastilles">
               {vehicule.a_louer && <span className="pastille pastille-location">À louer</span>}
               {vehicule.a_vendre && <span className="pastille pastille-vente">À vendre</span>}
+            {vehicule.verifie_le && <span className="pastille pastille-verifie" title="Le véhicule correspond à ses documents">✓ Vérifié par un agent</span>}
             </div>
             <h1>{vehicule.marque} {vehicule.modele}</h1>
             <p className="champ-aide">Proposé par {vehicule.partenaire.nom_commercial} · {vehicule.ville}</p>
@@ -68,6 +70,7 @@ export default function FicheVehicule() {
             </dl>
             {vehicule.description && <p>{vehicule.description}</p>}
             {peutSignaler && <Signaler cible={{ vehicule_id: vehicule.id }} libelle="Signaler cette annonce" />}
+            {utilisateur?.role === 'admin' && <DemanderInspection vehicule={vehicule} />}
           </div>
           <DemandeVehicule vehicule={vehicule} />
         </div>
