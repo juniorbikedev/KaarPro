@@ -12,6 +12,7 @@ use App\Models\Demande;
 use App\Models\User;
 use App\Models\Vehicule;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -66,23 +67,25 @@ class DatabaseSeeder extends Seeder
             'valide_le' => now(),
         ]);
 
-        // Quelques véhicules pour que le catalogue ne soit pas vide (sans photos : l'interface affiche une illustration)
+        // Quelques véhicules récents pour que le catalogue ne soit pas vide. Leurs photos (licence libre,
+        // Wikimedia Commons) sont dans database/seeders/photos, avec les crédits dans CREDITS.md.
         $vehicules = [
-            [$locationAuto, 'DK-2201-AA', 'Toyota', 'Corolla', 2021, 'berline', 'essence', 'automatique', 5, 42000, 'Dakar', 'location', 30000, null, 150000],
-            [$locationAuto, 'DK-2202-AB', 'Hyundai', 'Tucson', 2022, 'suv', 'diesel', 'automatique', 5, 31000, 'Dakar', 'location', 45000, null, 250000],
-            [$locationAuto, 'TH-3101-AC', 'Toyota', 'Hiace', 2019, 'minibus', 'diesel', 'manuelle', 15, 98000, 'Thiès', 'location', 70000, null, 300000],
-            [$prestige, 'DK-5501-BA', 'Kia', 'Picanto', 2020, 'citadine', 'essence', 'manuelle', 4, 56000, 'Dakar', 'vente', null, 5900000, null],
-            [$prestige, 'DK-5502-BB', 'Toyota', 'Land Cruiser', 2018, '4x4', 'diesel', 'automatique', 7, 120000, 'Dakar', 'vente_et_location', 90000, 28500000, 400000],
-            [$prestige, 'MB-5503-BC', 'Peugeot', '3008', 2021, 'suv', 'essence', 'automatique', 5, 38000, 'Mbour', 'vente_et_location', 40000, 14900000, 200000],
+            [$locationAuto, 'DK-2201-AA', 'Mercedes-Benz', 'Classe C', 2023, 'berline', 'diesel', 'automatique', 5, 18000, 'Dakar', 'location', 65000, null, 400000, 'mercedes-classe-c'],
+            [$locationAuto, 'DK-2202-AB', 'Hyundai', 'Tucson', 2023, 'suv', 'diesel', 'automatique', 5, 24000, 'Dakar', 'location', 45000, null, 250000, 'hyundai-tucson'],
+            [$locationAuto, 'TH-3101-AC', 'Mercedes-Benz', 'Classe V', 2024, 'minibus', 'diesel', 'automatique', 8, 12000, 'Thiès', 'location', 90000, null, 500000, 'mercedes-classe-v'],
+            [$prestige, 'DK-5501-BA', 'Land Rover', 'Range Rover Sport', 2023, 'suv', 'essence', 'automatique', 5, 15000, 'Dakar', 'vente', null, 75000000, null, 'range-rover-sport'],
+            [$prestige, 'DK-5502-BB', 'Toyota', 'Land Cruiser 300', 2022, '4x4', 'diesel', 'automatique', 7, 35000, 'Dakar', 'vente_et_location', 120000, 62000000, 600000, 'toyota-land-cruiser-300'],
+            [$prestige, 'MB-5503-BC', 'Peugeot', '408', 2023, 'berline', 'essence', 'automatique', 5, 21000, 'Mbour', 'vente_et_location', 45000, 22500000, 250000, 'peugeot-408'],
         ];
-        foreach ($vehicules as [$partenaire, $immat, $marque, $modele, $annee, $categorie, $carburant, $boite, $places, $km, $ville, $mode, $jour, $vente, $caution]) {
-            $partenaire->vehicules()->updateOrCreate(['immatriculation' => $immat], [
+        foreach ($vehicules as [$partenaire, $immat, $marque, $modele, $annee, $categorie, $carburant, $boite, $places, $km, $ville, $mode, $jour, $vente, $caution, $photos]) {
+            $vehicule = $partenaire->vehicules()->updateOrCreate(['immatriculation' => $immat], [
                 'marque' => $marque, 'modele' => $modele, 'annee' => $annee, 'categorie' => $categorie,
                 'carburant' => $carburant, 'boite' => $boite, 'places' => $places, 'kilometrage' => $km,
                 'ville' => $ville, 'mode_offre' => $mode, 'prix_jour' => $jour, 'prix_vente' => $vente,
                 'montant_caution' => $caution,
                 'description' => "{$marque} {$modele} de {$annee}, entretenu régulièrement. Véhicule de démonstration.",
             ]);
+            $this->photos($vehicule, $photos);
         }
 
         // Une demande de location en attente et une conversation, pour essayer le traitement côté loueur
@@ -109,6 +112,26 @@ class DatabaseSeeder extends Seeder
                 'auteur_id' => $client->id,
                 'contenu' => 'Bonjour, le véhicule peut-il être livré à Dakar Plateau ?',
             ]);
+        }
+    }
+
+    /** Remplace les photos d'un véhicule de démonstration par celles du dossier seeders/photos. */
+    private function photos(Vehicule $vehicule, string $prefixe): void
+    {
+        $fichiers = glob(__DIR__."/photos/{$prefixe}-*.jpg") ?: [];
+        sort($fichiers);
+        if ($fichiers === []) {
+            return;
+        }
+
+        foreach ($vehicule->photos as $ancienne) {
+            Storage::disk('local')->delete($ancienne->chemin);
+            $ancienne->delete();
+        }
+        foreach ($fichiers as $ordre => $fichier) {
+            $chemin = "vehicules/{$vehicule->id}/".basename($fichier);
+            Storage::disk('local')->put($chemin, file_get_contents($fichier));
+            $vehicule->photos()->create(['chemin' => $chemin, 'ordre' => $ordre + 1]);
         }
     }
 }

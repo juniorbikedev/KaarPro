@@ -46,7 +46,7 @@ export default function Catalogue() {
     <section>
       <h1>Catalogue des véhicules</h1>
       <form className="carte filtres" onSubmit={rechercher}>
-        <input className="select filtre-large" name="q" value={form.q} onChange={changer} placeholder="Marque ou modèle (ex. : Corolla)" aria-label="Recherche" />
+        <input className="select filtre-large" name="q" value={form.q} onChange={changer} placeholder="Marque ou modèle (ex. : Tucson)" aria-label="Recherche" />
         <select className="select" name="offre" value={form.offre} onChange={changer} aria-label="Type d'offre">
           <option value="">Louer ou acheter</option>
           <option value="location">À louer</option>
