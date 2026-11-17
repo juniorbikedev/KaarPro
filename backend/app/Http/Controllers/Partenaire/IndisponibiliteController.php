@@ -49,6 +49,6 @@ class IndisponibiliteController extends Controller
 
     private function verifierProprietaire(Request $request, Vehicule $vehicule): void
     {
-        abort_unless($vehicule->partenaire_id === $request->user()->partenaire->id, 404);
+        abort_unless($vehicule->partenaire_id === $this->partenaireCourant($request)->id, 404);
     }
 }

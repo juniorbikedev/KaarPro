@@ -39,6 +39,6 @@ class Conversation extends Model
     /** Le client ou le compte du partenaire concerné. */
     public function concerne(User $user): bool
     {
-        return $this->client_id === $user->id || $this->partenaire->user_id === $user->id;
+        return $this->client_id === $user->id || $this->partenaire->gestionnaires()->contains('id', $user->id);
     }
 }

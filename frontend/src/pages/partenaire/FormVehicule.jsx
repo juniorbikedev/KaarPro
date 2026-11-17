@@ -4,6 +4,7 @@ import { api, erreurApi } from '../../api'
 import { useAuth } from '../../auth/AuthContext'
 import Champ from '../../components/Champ'
 import { BOITES, CARBURANTS, CATEGORIES, ETATS, MODES_OFFRE, modesPourActivite } from '../../libelles'
+import { useEspace } from '../../espace'
 
 const VIDE = {
   immatriculation: '', marque: '', modele: '', annee: '', categorie: 'berline', carburant: 'essence', boite: 'manuelle',
@@ -24,11 +25,13 @@ function Liste({ label, nom, valeur, options, onChange, erreur }) {
 
 /** « Publier un véhicule » (sans identifiant) ou « Modifier un véhicule ». */
 export default function FormVehicule() {
+  const { base, parc, libelleVehicules } = useEspace()
   const { id } = useParams()
   const edition = Boolean(id)
   const naviguer = useNavigate()
   const { utilisateur } = useAuth()
-  const modes = modesPourActivite(utilisateur.partenaire.type_activite)
+  // Le parc de TerangaAuto propose aussi bien la vente que la location
+  const modes = modesPourActivite(parc ? 'vente_et_location' : utilisateur.partenaire.type_activite)
 
   const [form, setForm] = useState({ ...VIDE, mode_offre: modes[0] })
   const [photosExistantes, setPhotosExistantes] = useState([])
@@ -40,12 +43,12 @@ export default function FormVehicule() {
 
   useEffect(() => {
     if (!edition) return
-    api.get(`/partenaire/vehicules/${id}`).then(({ data }) => {
+    api.get(`${base}/vehicules/${id}`).then(({ data }) => {
       const v = data.data
       setForm(Object.fromEntries(Object.keys(VIDE).map((cle) => [cle, v[cle] ?? ''])))
       setPhotosExistantes(v.photos)
     })
-  }, [edition, id])
+  }, [base, edition, id])
 
   const changer = (e) => setForm({ ...form, [e.target.name]: e.target.value })
   const louable = form.mode_offre !== 'vente'
@@ -57,11 +60,11 @@ export default function FormVehicule() {
     setErreur({ message: '', champs: {} })
     try {
       if (edition) {
-        await api.put(`/partenaire/vehicules/${id}`, form)
+        await api.put(`${base}/vehicules/${id}`, form)
         if (photos.length) {
           const donnees = new FormData()
           photos.forEach((p) => donnees.append('photos[]', p))
-          await api.post(`/partenaire/vehicules/${id}/photos`, donnees)
+          await api.post(`${base}/vehicules/${id}/photos`, donnees)
         }
       } else {
         const donnees = new FormData()
@@ -69,9 +72,9 @@ export default function FormVehicule() {
         photos.forEach((p) => donnees.append('photos[]', p))
         if (carteGrise) donnees.append('carte_grise', carteGrise)
         if (assurance) donnees.append('assurance', assurance)
-        await api.post('/partenaire/vehicules', donnees)
+        await api.post(`${base}/vehicules`, donnees)
       }
-      naviguer('/partenaire/vehicules')
+      naviguer(`${base}/vehicules`)
     } catch (err) {
       setErreur(erreurApi(err))
     } finally {
@@ -81,7 +84,7 @@ export default function FormVehicule() {
 
   async function supprimerPhoto(photo) {
     try {
-      const { data } = await api.delete(`/partenaire/vehicules/${id}/photos/${photo.id}`)
+      const { data } = await api.delete(`${base}/vehicules/${id}/photos/${photo.id}`)
       setPhotosExistantes(data.data.photos)
     } catch (err) {
       setErreur(erreurApi(err))
@@ -93,7 +96,7 @@ export default function FormVehicule() {
 
   return (
     <section className="formulaire-page formulaire-large">
-      <p><Link to="/partenaire/vehicules">← Mes véhicules</Link></p>
+      <p><Link to={`${base}/vehicules`}>← {libelleVehicules}</Link></p>
       <h1>{edition ? 'Modifier le véhicule' : 'Publier un véhicule'}</h1>
       <form className="carte formulaire" onSubmit={envoyer} noValidate>
         {erreur.message && !Object.keys(champs).length && <p className="alerte alerte-erreur">{erreur.message}</p>}

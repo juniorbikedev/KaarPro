@@ -9,6 +9,7 @@ use App\Enums\TypeActivite;
 use App\Enums\TypeDemande;
 use App\Models\Conversation;
 use App\Models\Demande;
+use App\Models\Partenaire;
 use App\Models\User;
 use App\Models\Vehicule;
 use Illuminate\Database\Seeder;
@@ -77,13 +78,29 @@ class DatabaseSeeder extends Seeder
             [$prestige, 'DK-5502-BB', 'Toyota', 'Land Cruiser 300', 2022, '4x4', 'diesel', 'automatique', 7, 35000, 'Dakar', 'vente_et_location', 120000, 62000000, 600000, 'toyota-land-cruiser-300'],
             [$prestige, 'MB-5503-BC', 'Peugeot', '408', 2023, 'berline', 'essence', 'automatique', 5, 21000, 'Mbour', 'vente_et_location', 45000, 22500000, 250000, 'peugeot-408'],
         ];
+
+        // Parc de TerangaAuto : véhicules de l'entreprise, gérés par l'administrateur et sans commission
+        $administrateur = User::where('role', Role::Admin)->first();
+        if ($administrateur) {
+            $parc = Partenaire::interne($administrateur);
+            array_push($vehicules,
+                [$parc, 'DK-7001-TA', 'Toyota', 'RAV4 hybride rechargeable', 2024, 'suv', 'hybride', 'automatique', 5, 9000, 'Dakar', 'vente_et_location', 60000, 38000000, 300000, 'toyota-rav4'],
+                [$parc, 'DK-7002-TA', 'Kia', 'Sportage', 2023, 'suv', 'essence', 'automatique', 5, 16000, 'Dakar', 'location', 50000, null, 250000, 'kia-sportage'],
+                [$parc, 'DK-7003-TA', 'Hyundai', 'Santa Fe', 2024, 'suv', 'hybride', 'automatique', 7, 7000, 'Dakar', 'vente_et_location', 70000, 42000000, 350000, 'hyundai-santa-fe'],
+                [$parc, 'DK-7004-TA', 'Toyota', 'Land Cruiser Prado 250', 2025, '4x4', 'diesel', 'automatique', 7, 3000, 'Dakar', 'vente', null, 58000000, null, 'toyota-land-cruiser-prado'],
+                [$parc, 'TH-7005-TA', 'Toyota', 'Yaris Cross hybride', 2023, 'citadine', 'hybride', 'automatique', 5, 20000, 'Thiès', 'location', 35000, null, 150000, 'toyota-yaris-cross'],
+                [$parc, 'DK-7006-TA', 'Toyota', 'Hilux GR Sport', 2024, 'utilitaire', 'diesel', 'automatique', 5, 11000, 'Dakar', 'vente_et_location', 65000, 32000000, 300000, 'toyota-hilux'],
+            );
+        }
         foreach ($vehicules as [$partenaire, $immat, $marque, $modele, $annee, $categorie, $carburant, $boite, $places, $km, $ville, $mode, $jour, $vente, $caution, $photos]) {
             $vehicule = $partenaire->vehicules()->updateOrCreate(['immatriculation' => $immat], [
                 'marque' => $marque, 'modele' => $modele, 'annee' => $annee, 'categorie' => $categorie,
                 'carburant' => $carburant, 'boite' => $boite, 'places' => $places, 'kilometrage' => $km,
                 'ville' => $ville, 'mode_offre' => $mode, 'prix_jour' => $jour, 'prix_vente' => $vente,
                 'montant_caution' => $caution,
-                'description' => "{$marque} {$modele} de {$annee}, entretenu régulièrement. Véhicule de démonstration.",
+                'description' => $partenaire->est_interne
+                    ? "{$marque} {$modele} de {$annee}, du parc TerangaAuto : entretenu dans nos ateliers, assistance incluse. Véhicule de démonstration."
+                    : "{$marque} {$modele} de {$annee}, entretenu régulièrement. Véhicule de démonstration.",
             ]);
             $this->photos($vehicule, $photos);
         }

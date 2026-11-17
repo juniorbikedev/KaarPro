@@ -193,7 +193,7 @@ class VehiculeController extends Controller
 
     private function partenaire(Request $request): Partenaire
     {
-        return $request->user()->partenaire;
+        return $this->partenaireCourant($request);
     }
 
     private function verifierProprietaire(Request $request, Vehicule $vehicule): void

@@ -285,6 +285,7 @@ button.etoile { font-size: 1.6rem; cursor: pointer; }
 
 /* Missions de l'agent : comparaison départ/retour, caution, inspection */
 .pastille-verifie { background: #e8f6ee; color: var(--vert); }
+.pastille-terangaauto { background: var(--bleu); color: #fff; }
 .realisation { align-items: start; }
 .constat-depart { background: var(--fond); }
 .constat .grille-2 { align-items: start; }

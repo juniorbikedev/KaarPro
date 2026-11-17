@@ -24,6 +24,8 @@ class PartenaireValide
             return response()->json(['message' => "Votre compte partenaire n'est pas encore validé par un administrateur."], 403);
         }
 
+        $request->attributes->set('partenaire', $user->partenaire);
+
         return $next($request);
     }
 }

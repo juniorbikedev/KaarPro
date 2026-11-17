@@ -15,7 +15,7 @@ class PaiementController extends Controller
     public function index(Request $request): JsonResponse
     {
         $paiements = Paiement::where('statut', StatutPaiement::Reussi)
-            ->whereHas('demande', fn ($q) => $q->where('partenaire_id', $request->user()->partenaire->id))
+            ->whereHas('demande', fn ($q) => $q->where('partenaire_id', $this->partenaireCourant($request)->id))
             ->with(['demande.vehicule', 'client'])
             ->latest('paye_le')
             ->get();

@@ -42,10 +42,12 @@ export default function Layout() {
                 <>
                   <NavLink to="/admin/tableau-de-bord">Tableau de bord</NavLink>
                   <NavLink to="/admin/partenaires">Partenaires</NavLink>
+                  <NavLink to="/admin/parc/vehicules">Parc TerangaAuto</NavLink>
                   <NavLink to="/admin/utilisateurs">Utilisateurs</NavLink>
                   <NavLink to="/admin/paiements">Paiements</NavLink>
                   <NavLink to="/admin/missions">Missions</NavLink>
                   <NavLink to="/admin/signalements">Signalements</NavLink>
+                  <NavLink to="/messages">Messages</NavLink>
                 </>
               )}
               <NavLink to="/profil">Profil</NavLink>

@@ -50,6 +50,13 @@ export default function App() {
             <Route path="demandes" element={<Protege roles={['client']}><MesDemandes /></Protege>} />
             <Route path="paiement/:reference" element={<Protege roles={['client']}><PagePaiement /></Protege>} />
             <Route path="partenaire/paiements" element={<Protege roles={['vendeur']}><Encaissements /></Protege>} />
+            {/* Parc de TerangaAuto : les pages du vendeur/loueur, servies à l'administrateur */}
+            <Route path="admin/parc/vehicules" element={<Protege roles={['admin']}><MesVehicules /></Protege>} />
+            <Route path="admin/parc/vehicules/nouveau" element={<Protege roles={['admin']}><FormVehicule /></Protege>} />
+            <Route path="admin/parc/vehicules/:id/modifier" element={<Protege roles={['admin']}><FormVehicule /></Protege>} />
+            <Route path="admin/parc/vehicules/:id/calendrier" element={<Protege roles={['admin']}><CalendrierVehicule /></Protege>} />
+            <Route path="admin/parc/demandes" element={<Protege roles={['admin']}><DemandesRecues /></Protege>} />
+            <Route path="admin/parc/paiements" element={<Protege roles={['admin']}><Encaissements /></Protege>} />
             <Route path="admin/paiements" element={<Protege roles={['admin']}><Paiements /></Protege>} />
             <Route path="admin/tableau-de-bord" element={<Protege roles={['admin']}><TableauDeBord /></Protege>} />
             <Route path="admin/signalements" element={<Protege roles={['admin']}><Signalements /></Protege>} />
@@ -58,8 +65,8 @@ export default function App() {
             <Route path="agent/missions/:id" element={<Protege roles={['agent']}><RealiserEtatDesLieux /></Protege>} />
             <Route path="etats-des-lieux/:id" element={<Protege><EtatDesLieux /></Protege>} />
             <Route path="contrats/:id" element={<Protege roles={['client', 'vendeur', 'admin']}><Contrat /></Protege>} />
-            <Route path="messages" element={<Protege roles={['client', 'vendeur']}><Messagerie /></Protege>} />
-            <Route path="messages/:id" element={<Protege roles={['client', 'vendeur']}><Messagerie /></Protege>} />
+            <Route path="messages" element={<Protege roles={['client', 'vendeur', 'admin']}><Messagerie /></Protege>} />
+            <Route path="messages/:id" element={<Protege roles={['client', 'vendeur', 'admin']}><Messagerie /></Protege>} />
             <Route path="profil" element={<Protege><Profil /></Protege>} />
             <Route path="admin/partenaires" element={<Protege roles={['admin']}><Partenaires /></Protege>} />
             <Route path="admin/utilisateurs" element={<Protege roles={['admin']}><Utilisateurs /></Protege>} />

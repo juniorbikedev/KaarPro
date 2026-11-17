@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\VerifierRole::class,
             'partenaire.valide' => \App\Http\Middleware\PartenaireValide::class,
+            'parc.terangaauto' => \App\Http\Middleware\ParcTerangaAuto::class,
         ]);
         $middleware->api(append: [\App\Http\Middleware\EnTetesSecurite::class]);
 

@@ -46,7 +46,7 @@ class AvisController extends Controller
             'vehicule_id' => $demande->vehicule_id,
         ]);
 
-        $demande->partenaire->user->notify(new Alerte('avis', 'Nouvel avis',
+        $demande->partenaire->notifier(new Alerte('avis', 'Nouvel avis',
             "{$request->user()->nom} a noté le {$demande->vehicule->marque} {$demande->vehicule->modele} : {$avis->note}/5.",
             "/vehicules/{$demande->vehicule_id}"));
 

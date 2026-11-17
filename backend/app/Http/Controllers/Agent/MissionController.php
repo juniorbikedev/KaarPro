@@ -162,7 +162,7 @@ class MissionController extends Controller
         $lien = "/etats-des-lieux/{$etatDesLieux->id}";
         $texte = "{$etatDesLieux->type->libelle()} du {$vehicule->marque} {$vehicule->modele} enregistré par {$request->user()->nom}.";
         $demande->client->notify(new Alerte('etat_des_lieux', $etatDesLieux->type->libelle(), $texte, $lien));
-        $demande->partenaire->user->notify(new Alerte('etat_des_lieux', $etatDesLieux->type->libelle(), $texte, $lien));
+        $demande->partenaire->notifier(new Alerte('etat_des_lieux', $etatDesLieux->type->libelle(), $texte, $lien));
     }
 
     /**
@@ -220,13 +220,13 @@ class MissionController extends Controller
         $nom = "{$vehicule->marque} {$vehicule->modele} ({$vehicule->immatriculation})";
         $lien = "/etats-des-lieux/{$inspection->id}";
         if ($conforme) {
-            $vehicule->partenaire->user->notify(new Alerte('inspection', 'Véhicule vérifié',
+            $vehicule->partenaire->notifier(new Alerte('inspection', 'Véhicule vérifié',
                 "Votre {$nom} a été inspecté et jugé conforme : l'annonce porte le badge « Vérifié par un agent ».", $lien));
 
             return;
         }
 
-        $vehicule->partenaire->user->notify(new Alerte('inspection', 'Non-conformité relevée',
+        $vehicule->partenaire->notifier(new Alerte('inspection', 'Non-conformité relevée',
             "L'inspection de votre {$nom} a relevé une non-conformité : {$donnees['dommages']}", $lien));
         $admins = User::where('role', Role::Admin)->where('est_actif', true)->get();
         Notification::send($admins, new Alerte('signalement', 'Non-conformité relevée',

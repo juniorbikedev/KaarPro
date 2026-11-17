@@ -20,7 +20,9 @@ class PartenaireController extends Controller
     {
         $request->validate(['statut' => ['nullable', Rule::enum(StatutValidation::class)]]);
 
+        // Le parc de TerangaAuto n'est pas un partenaire à valider : il est géré depuis l'espace « Parc TerangaAuto »
         $partenaires = Partenaire::with('user')
+            ->where('est_interne', false)
             ->when($request->statut, fn ($q, $statut) => $q->where('statut_validation', $statut))
             ->latest()
             ->paginate(20);

@@ -24,7 +24,7 @@ class DemandeController extends Controller
     {
         $request->validate(['statut' => ['nullable', Rule::enum(StatutDemande::class)]]);
 
-        $demandes = $request->user()->partenaire->demandes()
+        $demandes = $this->partenaireCourant($request)->demandes()
             ->when($request->query('statut'), fn ($q, $statut) => $q->where('statut', $statut))
             ->with(self::RELATIONS)
             ->latest()
@@ -180,6 +180,6 @@ class DemandeController extends Controller
 
     private function verifierPartenaire(Request $request, Demande $demande): void
     {
-        abort_unless($demande->partenaire_id === $request->user()->partenaire->id, 404);
+        abort_unless($demande->partenaire_id === $this->partenaireCourant($request)->id, 404);
     }
 }

@@ -82,7 +82,7 @@ class DemandeController extends Controller
 
         $demande = $vehicule->demandes()->create($attributs);
 
-        $vehicule->partenaire->user->notify(new Alerte('demande',
+        $vehicule->partenaire->notifier(new Alerte('demande',
             $type === TypeDemande::Location ? 'Nouvelle demande de location' : "Nouvelle demande d'achat",
             "{$request->user()->nom} s'intéresse à votre {$vehicule->marque} {$vehicule->modele}.",
             '/partenaire/demandes'));

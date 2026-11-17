@@ -33,7 +33,7 @@ class ContratController extends Controller
         $request->validate(['accepte' => ['accepted']]);
         $contrat->update(['signe_client_le' => now()]);
 
-        $contrat->demande->partenaire->user->notify(new Alerte('contrat', 'Contrat signé',
+        $contrat->demande->partenaire->notifier(new Alerte('contrat', 'Contrat signé',
             "{$request->user()->nom} a signé le contrat {$contrat->numero}. Le paiement peut maintenant être effectué.",
             "/contrats/{$contrat->id}"));
 

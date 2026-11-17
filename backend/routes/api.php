@@ -51,8 +51,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('moi', [ProfilController::class, 'update']);
     Route::put('moi/type-activite', [ProfilController::class, 'typeActivite']);
 
-    // Sprint 3 : espace du vendeur/loueur validé
-    Route::prefix('partenaire')->middleware('partenaire.valide')->group(function () {
+    // Sprint 3 : espace du vendeur/loueur validé ; les mêmes routes servent au parc de TerangaAuto (administrateur)
+    $espacePartenaire = function () {
         Route::get('vehicules', [VehiculeController::class, 'index']);
         Route::post('vehicules', [VehiculeController::class, 'store']);
         Route::get('vehicules/{vehicule}', [VehiculeController::class, 'show']);
@@ -71,7 +71,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Sprint 5 : encaissements
         Route::get('paiements', [PaiementPartenaireController::class, 'index']);
-    });
+    };
+    Route::prefix('partenaire')->middleware('partenaire.valide')->group($espacePartenaire);
 
     // Sprint 4 : demandes du client, contrats, messagerie
     Route::middleware('role:client')->group(function () {
@@ -109,7 +110,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('missions/{etatDesLieux}/realiser', [MissionController::class, 'realiser']);
     });
 
-    Route::prefix('admin')->middleware('role:admin')->group(function () {
+    Route::prefix('admin')->middleware('role:admin')->group(function () use ($espacePartenaire) {
         Route::get('utilisateurs', [UtilisateurController::class, 'index']);
         Route::post('agents', [UtilisateurController::class, 'storeAgent']);
         Route::patch('utilisateurs/{utilisateur}/activation', [UtilisateurController::class, 'activation']);
@@ -132,5 +133,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('missions', [MissionAdminController::class, 'index']);
         Route::post('missions/{etatDesLieux}/attribuer', [MissionAdminController::class, 'attribuer']);
         Route::post('vehicules/{vehicule}/inspection', [MissionAdminController::class, 'demanderInspection']);
+
+        // Parc de TerangaAuto : l'administrateur publie et gère les véhicules de l'entreprise
+        Route::prefix('parc')->middleware('parc.terangaauto')->group($espacePartenaire);
     });
 });

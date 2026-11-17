@@ -3,22 +3,24 @@ import { Link } from 'react-router-dom'
 import { api, erreurApi } from '../../api'
 import { SansPhoto } from '../../components/CarteVehicule'
 import { ETATS, MODES_OFFRE, fcfa } from '../../libelles'
+import { useEspace } from '../../espace'
 
 /** Cas « Gérer ses véhicules ». */
 export default function MesVehicules() {
+  const { base, parc, libelleVehicules } = useEspace()
   const [vehicules, setVehicules] = useState(null)
   const [erreur, setErreur] = useState('')
 
   const charger = useCallback(() => {
-    api.get('/partenaire/vehicules').then(({ data }) => setVehicules(data.data)).catch((err) => setErreur(erreurApi(err).message))
-  }, [])
+    api.get(`${base}/vehicules`).then(({ data }) => setVehicules(data.data)).catch((err) => setErreur(erreurApi(err).message))
+  }, [base])
 
   useEffect(() => { charger() }, [charger])
 
   async function basculer(v) {
     setErreur('')
     try {
-      await api.post(`/partenaire/vehicules/${v.id}/${v.statut_publication === 'publie' ? 'retirer' : 'republier'}`)
+      await api.post(`${base}/vehicules/${v.id}/${v.statut_publication === 'publie' ? 'retirer' : 'republier'}`)
       charger()
     } catch (err) {
       setErreur(erreurApi(err).message)
@@ -28,12 +30,18 @@ export default function MesVehicules() {
   return (
     <section>
       <div className="titre-actions">
-        <h1>Mes véhicules</h1>
-        <Link to="/partenaire/vehicules/nouveau" className="bouton">Publier un véhicule</Link>
+        <h1>{libelleVehicules}</h1>
+        <Link to={`${base}/vehicules/nouveau`} className="bouton">Publier un véhicule</Link>
       </div>
+      {parc && (
+        <p className="champ-aide">
+          Véhicules de l'entreprise, publiés sous la marque TerangaAuto et sans commission.{' '}
+          <Link to={`${base}/demandes`}>Demandes du parc</Link> · <Link to={`${base}/paiements`}>Encaissements du parc</Link>
+        </p>
+      )}
       {erreur && <p className="alerte alerte-erreur">{erreur}</p>}
       {vehicules === null && !erreur && <p className="chargement">Chargement…</p>}
-      {vehicules?.length === 0 && <article className="carte">Vous n'avez encore publié aucun véhicule.</article>}
+      {vehicules?.length === 0 && <article className="carte">{parc ? 'Aucun véhicule dans le parc pour le moment.' : "Vous n'avez encore publié aucun véhicule."}</article>}
       <div className="liste-vehicules">
         {vehicules?.map((v) => (
           <article key={v.id} className={`carte ligne-vehicule ${v.statut_publication === 'retire' ? 'retire' : ''}`}>
@@ -50,8 +58,8 @@ export default function MesVehicules() {
               </span>
             </div>
             <div className="ligne-vehicule-actions">
-              <Link to={`/partenaire/vehicules/${v.id}/modifier`} className="bouton bouton-petit bouton-discret">Modifier</Link>
-              {v.a_louer && <Link to={`/partenaire/vehicules/${v.id}/calendrier`} className="bouton bouton-petit bouton-discret">Calendrier</Link>}
+              <Link to={`${base}/vehicules/${v.id}/modifier`} className="bouton bouton-petit bouton-discret">Modifier</Link>
+              {v.a_louer && <Link to={`${base}/vehicules/${v.id}/calendrier`} className="bouton bouton-petit bouton-discret">Calendrier</Link>}
               <button type="button" className="bouton bouton-petit bouton-discret" onClick={() => basculer(v)}>
                 {v.statut_publication === 'publie' ? 'Retirer' : 'Republier'}
               </button>
