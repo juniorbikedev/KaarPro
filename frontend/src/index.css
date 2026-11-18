@@ -335,7 +335,7 @@ button.etoile { font-size: 1.6rem; cursor: pointer; }
 .acc-surtitre { color: #ffc8a6; font-weight: 600; font-size: .9rem; letter-spacing: .02em; margin: 0 0 .75rem; }
 .acc-hero h1 { color: var(--blanc); font-size: 2.5rem; line-height: 1.12; letter-spacing: -.02em; margin: 0 0 1rem; max-width: 19ch; }
 .acc-chapo { font-size: 1.08rem; opacity: .9; max-width: 52ch; margin: 0 0 1.75rem; }
-.acc-recherche { position: relative; z-index: 1; display: grid; grid-template-columns: 1.1fr 1.3fr .8fr auto; gap: .5rem; background: var(--blanc); border-radius: 16px; padding: .5rem; box-shadow: 0 12px 30px -12px rgba(0, 0, 0, .45); }
+.acc-recherche { position: relative; z-index: 1; display: grid; grid-template-columns: 1.25fr 1.25fr .75fr auto; gap: .5rem; background: var(--blanc); border-radius: 16px; padding: .5rem; box-shadow: 0 12px 30px -12px rgba(0, 0, 0, .45); }
 .acc-champ { display: grid; gap: .1rem; padding: .35rem .75rem; border-radius: 10px; color: var(--texte); }
 .acc-champ + .acc-champ { border-left: 1px solid var(--bord); border-radius: 0; }
 .acc-champ span { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--gris); }
