@@ -90,6 +90,10 @@ export default function Espace() {
             <h2>Tableau de bord</h2>
             <p>Activité de la plateforme, commissions, éléments à traiter.</p>
           </Link>
+          <Link to="/admin/parc/vehicules" className="carte carte-choix">
+            <h2>Parc TerangaAuto</h2>
+            <p>Publier les véhicules de l'entreprise, traiter leurs demandes, sans commission.</p>
+          </Link>
           <Link to="/admin/partenaires" className="carte carte-choix">
             <h2>Valider les partenaires</h2>
             <p>Consulter les inscriptions en attente et leurs documents.</p>

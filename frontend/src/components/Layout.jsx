@@ -18,7 +18,8 @@ export default function Layout() {
           <span className="logo-icone" aria-hidden="true">K</span>
           Kaar<strong>Pro</strong>
         </Link>
-        <nav className="menu">
+        {/* Le menu de l'administrateur compte plus de liens : il est resserré pour tenir sur une ligne */}
+        <nav className={utilisateur?.role === 'admin' ? 'menu menu-dense' : 'menu'}>
           <NavLink to="/vehicules" end>Catalogue</NavLink>
           {utilisateur ? (
             <>
@@ -42,10 +43,12 @@ export default function Layout() {
                 <>
                   <NavLink to="/admin/tableau-de-bord">Tableau de bord</NavLink>
                   <NavLink to="/admin/partenaires">Partenaires</NavLink>
+                  <NavLink to="/admin/parc/vehicules">Parc TerangaAuto</NavLink>
                   <NavLink to="/admin/utilisateurs">Utilisateurs</NavLink>
                   <NavLink to="/admin/paiements">Paiements</NavLink>
                   <NavLink to="/admin/missions">Missions</NavLink>
                   <NavLink to="/admin/signalements">Signalements</NavLink>
+                  <NavLink to="/messages">Messages</NavLink>
                 </>
               )}
               <NavLink to="/profil">Profil</NavLink>

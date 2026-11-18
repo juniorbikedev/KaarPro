@@ -199,3 +199,7 @@ servis par lien signé et temporaire.
 | GET | `/api/admin/signalements?statut=` ; POST `/api/admin/signalements/{id}/traiter` (`statut`, `decision`, `mesure`) | admin |
 | POST | `/api/admin/avis/{id}/masquer` | admin |
 | GET | `/api/admin/tableau-de-bord` | admin |
+
+## Mémoire
+
+Le mémoire de licence qui présente KaarPro (analyse, conception UML, réalisation et bilan) est dans [`docs/memoire`](docs/memoire) : version PDF à lire et version Word.

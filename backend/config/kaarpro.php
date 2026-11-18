@@ -12,6 +12,14 @@ return [
         'vente' => (float) env('COMMISSION_VENTE', 3),
     ],
 
+    // Parc de TerangaAuto : véhicules de l'entreprise, publiés sans commission sous ce profil partenaire.
+    // Le représentant et le téléphone apparaissent sur les contrats de ces véhicules, à la place de l'administrateur.
+    'parc' => [
+        'nom_commercial' => env('PARC_NOM', 'TerangaAuto'),
+        'representant' => env('PARC_REPRESENTANT', 'Service commercial TerangaAuto'),
+        'telephone' => env('PARC_TELEPHONE', '33 800 00 00'),
+    ],
+
     // Passerelle de paiement : « simulateur » en développement, « paytech » avec un compte marchand PayTech
     'paiement' => [
         'passerelle' => env('PAIEMENT_PASSERELLE', 'simulateur'),

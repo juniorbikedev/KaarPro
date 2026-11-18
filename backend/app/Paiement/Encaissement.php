@@ -25,7 +25,8 @@ class Encaissement
     public function ouvrir(Demande $demande, string $operateur, string $telephone): array
     {
         $location = $demande->type === TypeDemande::Location;
-        $taux = (float) config('kaarpro.commission.'.($location ? 'location' : 'vente'));
+        // Aucune commission sur les véhicules du parc de TerangaAuto : l'entreprise encaisse la totalité
+        $taux = $demande->partenaire->est_interne ? 0.0 : (float) config('kaarpro.commission.'.($location ? 'location' : 'vente'));
         $commission = (int) round($demande->montant * $taux / 100);
         $caution = $location ? (int) $demande->montant_caution : 0;
 
@@ -106,7 +107,7 @@ class Encaissement
 
         $demande->client->notify(new Alerte('paiement', 'Paiement confirmé',
             "Votre paiement de {$montant} FCFA pour le {$vehicule} a été reçu.", '/demandes'));
-        $demande->partenaire->user->notify(new Alerte('paiement', 'Paiement reçu',
+        $demande->partenaire->notifier(new Alerte('paiement', 'Paiement reçu',
             "{$demande->client->nom} a payé pour le {$vehicule}. Montant qui vous revient : {$net} FCFA.", '/partenaire/paiements'));
 
         $agents = User::where('role', Role::Agent)->where('est_actif', true)->get();

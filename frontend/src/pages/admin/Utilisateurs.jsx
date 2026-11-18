@@ -65,32 +65,37 @@ export default function Utilisateurs() {
   return (
     <section>
       <h1>Gérer les utilisateurs</h1>
-      <div className="maitre-detail">
+      <div className="maitre-detail maitre-detail-liste">
         <div className="carte">
           <select className="select" value={role} onChange={(e) => setRole(e.target.value)}>
             <option value="">Tous les rôles</option>
             {Object.entries(LIBELLES_ROLE).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
           </select>
           {erreur && <p className="champ-erreur">{erreur}</p>}
-          <table className="tableau">
-            <thead><tr><th>Nom</th><th>Rôle</th><th>Statut</th><th /></tr></thead>
-            <tbody>
-              {liste.map((u) => (
-                <tr key={u.id}>
-                  <td><strong>{u.nom}</strong><br /><span className="champ-aide">{u.email}</span></td>
-                  <td>{LIBELLES_ROLE[u.role]}{u.zone ? ` (${u.zone})` : ''}</td>
-                  <td><span className={`statut ${u.est_actif ? 'statut-valide' : 'statut-refuse'}`}>{u.est_actif ? 'Actif' : 'Désactivé'}</span></td>
-                  <td>
-                    {u.id !== moi.id && (
-                      <button type="button" className="bouton bouton-petit bouton-discret" onClick={() => basculer(u)}>
-                        {u.est_actif ? 'Désactiver' : 'Réactiver'}
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="tableau-defilant">
+            <table className="tableau tableau-utilisateurs">
+              <thead><tr><th>Nom</th><th>Rôle</th><th>Statut</th><th /></tr></thead>
+              <tbody>
+                {liste.map((u) => (
+                  <tr key={u.id}>
+                    <td><strong>{u.nom}</strong><br /><span className="champ-aide">{u.email}</span></td>
+                    <td>{LIBELLES_ROLE[u.role]}{u.zone ? ` (${u.zone})` : ''}</td>
+                    <td><span className={`statut ${u.est_actif ? 'statut-valide' : 'statut-refuse'}`}>{u.est_actif ? 'Actif' : 'Désactivé'}</span></td>
+                    <td>
+                      {u.partenaire?.est_interne && (
+                        <span className="champ-aide" title="Ce compte porte le parc TerangaAuto : il ne peut pas être désactivé.">Porte le parc TerangaAuto</span>
+                      )}
+                      {u.id !== moi.id && !u.partenaire?.est_interne && (
+                        <button type="button" className="bouton bouton-petit bouton-discret" onClick={() => basculer(u)}>
+                          {u.est_actif ? 'Désactiver' : 'Réactiver'}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         <CreerAgent onCree={charger} />
       </div>

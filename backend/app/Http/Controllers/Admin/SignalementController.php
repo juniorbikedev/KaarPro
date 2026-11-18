@@ -46,7 +46,7 @@ class SignalementController extends Controller
         if ($mesure === 'retirer_annonce') {
             abort_unless($signalement->vehicule, 422, 'Ce signalement ne concerne pas une annonce.');
             $signalement->vehicule->update(['statut_publication' => Vehicule::RETIRE]);
-            $signalement->vehicule->partenaire->user->notify(new Alerte('signalement', 'Annonce retirée',
+            $signalement->vehicule->partenaire->notifier(new Alerte('signalement', 'Annonce retirée',
                 "Votre annonce {$signalement->vehicule->marque} {$signalement->vehicule->modele} a été retirée à la suite d'un signalement : {$donnees['decision']}",
                 '/partenaire/vehicules'));
         }
@@ -54,6 +54,7 @@ class SignalementController extends Controller
             $cible = $signalement->utilisateur;
             abort_unless($cible, 422, 'Ce signalement ne concerne pas un utilisateur.');
             abort_if($cible->is($request->user()), 422, 'Vous ne pouvez pas désactiver votre propre compte.');
+            abort_if($cible->estCompteDuParc(), 422, 'Ce compte porte le parc TerangaAuto : il ne peut pas être désactivé, sinon les véhicules du parc disparaîtraient du catalogue.');
             $cible->update(['est_actif' => false]);
             $cible->tokens()->delete();
         }

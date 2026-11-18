@@ -40,6 +40,7 @@ class VehiculeResource extends JsonResource
             'partenaire' => $this->whenLoaded('partenaire', fn () => [
                 'id' => $this->partenaire->id,
                 'nom_commercial' => $this->partenaire->nom_commercial,
+                'est_interne' => $this->partenaire->est_interne,
             ]),
             'indisponibilites' => $this->whenLoaded('indisponibilites', fn () => $this->indisponibilites->map(fn ($i) => [
                 'id' => $i->id,

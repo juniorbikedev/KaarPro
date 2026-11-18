@@ -3,9 +3,11 @@ import { Link, useParams } from 'react-router-dom'
 import { api, erreurApi } from '../../api'
 import Calendrier from '../../components/Calendrier'
 import { dateLisible } from '../../libelles'
+import { useEspace } from '../../espace'
 
 /** Cas « Gérer le calendrier de disponibilité » : le loueur bloque des périodes. */
 export default function CalendrierVehicule() {
+  const { base, libelleVehicules } = useEspace()
   const { id } = useParams()
   const [vehicule, setVehicule] = useState(null)
   const [debut, setDebut] = useState('')
@@ -14,8 +16,8 @@ export default function CalendrierVehicule() {
   const [erreur, setErreur] = useState('')
 
   const charger = useCallback(() => {
-    api.get(`/partenaire/vehicules/${id}`).then(({ data }) => setVehicule(data.data))
-  }, [id])
+    api.get(`${base}/vehicules/${id}`).then(({ data }) => setVehicule(data.data))
+  }, [base, id])
 
   useEffect(() => { charger() }, [charger])
 
@@ -33,7 +35,7 @@ export default function CalendrierVehicule() {
     e.preventDefault()
     setErreur('')
     try {
-      await api.post(`/partenaire/vehicules/${id}/indisponibilites`, { date_debut: debut, date_fin: fin || debut, motif })
+      await api.post(`${base}/vehicules/${id}/indisponibilites`, { date_debut: debut, date_fin: fin || debut, motif })
       setDebut(''); setFin(''); setMotif('')
       charger()
     } catch (err) {
@@ -43,7 +45,7 @@ export default function CalendrierVehicule() {
   }
 
   async function supprimer(indispo) {
-    await api.delete(`/partenaire/vehicules/${id}/indisponibilites/${indispo.id}`)
+    await api.delete(`${base}/vehicules/${id}/indisponibilites/${indispo.id}`)
     charger()
   }
 
@@ -52,7 +54,7 @@ export default function CalendrierVehicule() {
 
   return (
     <section>
-      <p><Link to="/partenaire/vehicules">← Mes véhicules</Link></p>
+      <p><Link to={`${base}/vehicules`}>← {libelleVehicules}</Link></p>
       <h1>Calendrier — {vehicule.marque} {vehicule.modele}</h1>
       <div className="grille-2">
         <article className="carte">
@@ -76,7 +78,7 @@ export default function CalendrierVehicule() {
                 <li key={i.id}>
                   <span>{dateLisible(i.date_debut)} → {dateLisible(i.date_fin)}{i.motif && <span className="champ-aide"> · {i.motif}</span>}</span>
                   {i.reservation
-                    ? <Link to="/partenaire/demandes" className="statut statut-valide">Location</Link>
+                    ? <Link to={`${base}/demandes`} className="statut statut-valide">Location</Link>
                     : <button type="button" className="lien" onClick={() => supprimer(i)}>Libérer</button>}
                 </li>
               ))}

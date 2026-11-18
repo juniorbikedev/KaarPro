@@ -20,3 +20,15 @@ Photos réelles sous licence libre, issues de Wikimedia Commons. Elles servent u
 | bmw-m5-2.jpg | Alexander Migl | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:BMW_M5_(G90)_IMG_3271.jpg |
 | renault-duster-1.jpg | Autosdeprimera | CC BY 3.0 | https://commons.wikimedia.org/wiki/File:2022_Renault_Duster_Intens_4x4_1.3_Turbo_(Colombia)_front_view_01.png |
 | renault-duster-2.jpg | Autosdeprimera | CC BY 3.0 | https://commons.wikimedia.org/wiki/File:2022_Renault_Duster_Intens_4x4_1.3_Turbo_(Colombia)_rear_view.png |
+| kia-sportage-1.jpg | Benespit | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:2023_Kia_Sportage_(NQ5)_in_White,_front_left.jpg |
+| kia-sportage-2.jpg | Benespit | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:2023_Kia_Sportage_(NQ5)_in_White,_rear_right.jpg |
+| hyundai-santa-fe-1.jpg | Benespit | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:2023_Hyundai_Santa_Fe_(MX5)_1.jpg |
+| hyundai-santa-fe-2.jpg | Benespit | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:2023_Hyundai_Santa_Fe_(MX5)_2.jpg |
+| toyota-land-cruiser-prado-1.jpg | Ethan Llamas | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:2025_Toyota_Land_Cruiser_Prado_250_2.4_Turbo_in_White_Pearl_Mica,_front_left.jpg |
+| toyota-land-cruiser-prado-2.jpg | Ethan Llamas | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:2025_Toyota_Land_Cruiser_Prado_2.4_Turbo_in_White_Pearl_Mica,_rear_left.jpg |
+| toyota-yaris-cross-1.jpg | TTTNIS | CC0 | https://commons.wikimedia.org/wiki/File:2020-2024_Toyota_Yaris_Cross_Hybrid_Z.jpg |
+| toyota-yaris-cross-2.jpg | TTTNIS | CC0 | https://commons.wikimedia.org/wiki/File:2020-2024_Toyota_Yaris_Cross_Hybrid_Z_rear.jpg |
+| toyota-rav4-1.jpg | Alexander-93 | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Toyota_RAV4_Plug-in_Hybrid_GR_Sport_IMG_9891.jpg |
+| toyota-rav4-2.jpg | Alexander-93 | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Toyota_RAV4_Plug-in_Hybrid_GR_Sport_IMG_9896.jpg |
+| toyota-hilux-1.jpg | LuvsMG481 | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:2024_Toyota_HiLux_GR_Sport_front.jpg |
+| toyota-hilux-2.jpg | LuvsMG481 | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:2024_Toyota_HiLux_GR_Sport_rear.jpg |

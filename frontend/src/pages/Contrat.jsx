@@ -33,7 +33,7 @@ export default function Contrat() {
   if (!contrat) return erreur ? <p className="alerte alerte-erreur">{erreur}</p> : <p className="chargement">Chargement…</p>
 
   const location = contrat.type === 'location'
-  const retour = utilisateur.role === 'client' ? '/demandes' : '/partenaire/demandes'
+  const retour = { client: '/demandes', vendeur: '/partenaire/demandes', admin: '/admin/parc/demandes' }[utilisateur.role]
   const v = contrat.vehicule
 
   return (

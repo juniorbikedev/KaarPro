@@ -51,6 +51,7 @@ export default function FicheVehicule() {
             <div className="pastilles">
               {vehicule.a_louer && <span className="pastille pastille-location">À louer</span>}
               {vehicule.a_vendre && <span className="pastille pastille-vente">À vendre</span>}
+            {vehicule.partenaire?.est_interne && <span className="pastille pastille-terangaauto" title="Véhicule du parc de TerangaAuto">TerangaAuto</span>}
             {vehicule.verifie_le && <span className="pastille pastille-verifie" title="Le véhicule correspond à ses documents">✓ Vérifié par un agent</span>}
             </div>
             <h1>{vehicule.marque} {vehicule.modele}</h1>

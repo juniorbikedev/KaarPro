@@ -25,17 +25,23 @@ class ConversationResource extends JsonResource
             'interlocuteur_id' => $estClient ? $this->partenaire->user_id : $this->client_id,
             'dernier_message' => $this->whenLoaded('dernierMessage', fn () => $this->dernierMessage ? [
                 'contenu' => $this->dernierMessage->contenu,
-                'de_moi' => $this->dernierMessage->auteur_id === $moi->id,
+                'de_moi' => $this->deMoi($this->dernierMessage, $estClient, $moi),
                 'cree_le' => $this->dernierMessage->created_at->toIso8601String(),
             ] : null),
             'non_lus' => $this->whenHas('non_lus', fn () => (int) $this->non_lus),
             'messages' => $this->whenLoaded('messages', fn () => $this->messages->map(fn ($m) => [
                 'id' => $m->id,
                 'contenu' => $m->contenu,
-                'de_moi' => $m->auteur_id === $moi->id,
+                'de_moi' => $this->deMoi($m, $estClient, $moi),
                 'lu' => $m->lu_le !== null,
                 'cree_le' => $m->created_at->toIso8601String(),
             ])),
         ];
+    }
+
+    /** Côté partenaire, tout message qui n'est pas du client est « de moi » (le parc est partagé par les administrateurs). */
+    private function deMoi($message, bool $estClient, $moi): bool
+    {
+        return $estClient ? $message->auteur_id === $moi->id : $message->auteur_id !== $this->client_id;
     }
 }

@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api, erreurApi } from '../../api'
 import CarteDemande from '../../components/CarteDemande'
+import { useEspace } from '../../espace'
 
 const FILTRES = { en_attente: 'En attente', acceptee: 'Acceptées', refusee: 'Refusées', '': 'Toutes' }
 
 function Actions({ demande, onChange }) {
+  const { base } = useEspace()
   const [refus, setRefus] = useState(false)
   const [motif, setMotif] = useState('')
   const [erreur, setErreur] = useState('')
@@ -12,7 +14,7 @@ function Actions({ demande, onChange }) {
   async function decider(action) {
     setErreur('')
     try {
-      await api.post(`/partenaire/demandes/${demande.id}/${action}`, action === 'refuser' ? { motif } : {})
+      await api.post(`${base}/demandes/${demande.id}/${action}`, action === 'refuser' ? { motif } : {})
       onChange()
     } catch (err) {
       const e = erreurApi(err)
@@ -41,6 +43,7 @@ function Actions({ demande, onChange }) {
 
 /** Cas « Traiter les demandes reçues » (vendeur/loueur). Accepter génère le contrat. */
 export default function DemandesRecues() {
+  const { base, parc } = useEspace()
   const [filtre, setFiltre] = useState('en_attente')
   const [demandes, setDemandes] = useState(null)
   const [version, setVersion] = useState(0)
@@ -49,14 +52,14 @@ export default function DemandesRecues() {
   useEffect(() => {
     // Une réponse arrivée après un changement d'onglet est ignorée
     let actuelle = true
-    api.get('/partenaire/demandes', { params: filtre ? { statut: filtre } : {} })
+    api.get(`${base}/demandes`, { params: filtre ? { statut: filtre } : {} })
       .then(({ data }) => { if (actuelle) setDemandes(data.data) })
     return () => { actuelle = false }
-  }, [filtre, version])
+  }, [base, filtre, version])
 
   return (
     <section>
-      <h1>Demandes reçues</h1>
+      <h1>{parc ? 'Demandes — Parc TerangaAuto' : 'Demandes reçues'}</h1>
       <div className="onglets">
         {Object.entries(FILTRES).map(([valeur, libelle]) => (
           <button key={valeur} type="button" className={filtre === valeur ? 'onglet onglet-actif' : 'onglet'} onClick={() => setFiltre(valeur)}>{libelle}</button>

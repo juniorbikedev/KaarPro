@@ -39,6 +39,12 @@ class User extends Authenticatable
     /**
      * @return array<string, string>
      */
+    /** Vrai pour le compte d'administrateur auquel est rattaché le parc de TerangaAuto. */
+    public function estCompteDuParc(): bool
+    {
+        return (bool) $this->partenaire?->est_interne;
+    }
+
     protected function casts(): array
     {
         return [

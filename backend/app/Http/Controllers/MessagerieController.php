@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Role;
 use App\Http\Resources\ConversationResource;
 use App\Models\Conversation;
 use App\Models\Vehicule;
@@ -23,10 +24,13 @@ class MessagerieController extends Controller
         $conversations = Conversation::query()
             ->where(fn (Builder $q) => $q
                 ->where('client_id', $user->id)
-                ->orWhereHas('partenaire', fn ($p) => $p->where('user_id', $user->id)))
+                ->orWhereHas('partenaire', fn ($p) => $p->where(fn ($p) => $p
+                    ->where('user_id', $user->id)
+                    ->when($user->role === Role::Admin, fn ($p) => $p->orWhere('est_interne', true)))))
             ->whereHas('messages')
             ->with([...self::RELATIONS, 'dernierMessage'])
-            ->withCount(['messages as non_lus' => fn ($q) => $q->whereNull('lu_le')->where('auteur_id', '!=', $user->id)])
+            ->withCount(['messages as non_lus' => fn ($q) => $q->whereNull('lu_le')
+                ->whereColumn('messages.auteur_id', $user->role === Role::Client ? '!=' : '=', 'conversations.client_id')])
             ->latest('updated_at')
             ->get();
 
@@ -53,7 +57,7 @@ class MessagerieController extends Controller
 
         $conversation->messages()
             ->whereNull('lu_le')
-            ->where('auteur_id', '!=', $request->user()->id)
+            ->where('auteur_id', $conversation->client_id === $request->user()->id ? '!=' : '=', $conversation->client_id)
             ->update(['lu_le' => now()]);
 
         return new ConversationResource($conversation->load([...self::RELATIONS, 'messages']));
@@ -72,11 +76,11 @@ class MessagerieController extends Controller
         // Une seule notification tant que le destinataire n'a pas lu les messages précédents de l'auteur
         if (! $precedent || $precedent->auteur_id !== $auteur->id || $precedent->lu_le !== null) {
             $estClient = $conversation->client_id === $auteur->id;
-            $destinataire = $estClient ? $conversation->partenaire->user : $conversation->client;
             $expediteur = $estClient ? $auteur->nom : $conversation->partenaire->nom_commercial;
-            $destinataire->notify(new Alerte('message', 'Nouveau message',
+            $alerte = new Alerte('message', 'Nouveau message',
                 "{$expediteur} vous a écrit à propos du {$conversation->vehicule->marque} {$conversation->vehicule->modele}.",
-                "/messages/{$conversation->id}"));
+                "/messages/{$conversation->id}");
+            $estClient ? $conversation->partenaire->notifier($alerte) : $conversation->client->notify($alerte);
         }
 
         return new ConversationResource($conversation->load([...self::RELATIONS, 'messages']));

@@ -24,7 +24,7 @@ class DemandeController extends Controller
     {
         $request->validate(['statut' => ['nullable', Rule::enum(StatutDemande::class)]]);
 
-        $demandes = $request->user()->partenaire->demandes()
+        $demandes = $this->partenaireCourant($request)->demandes()
             ->when($request->query('statut'), fn ($q, $statut) => $q->where('statut', $statut))
             ->with(self::RELATIONS)
             ->latest()
@@ -140,8 +140,9 @@ class DemandeController extends Controller
                 ],
                 'partenaire' => [
                     'nom_commercial' => $demande->partenaire->nom_commercial,
-                    'representant' => $demande->partenaire->user->nom,
-                    'telephone' => $demande->partenaire->user->telephone,
+                    // Pour le parc de TerangaAuto, c'est l'entreprise qui s'engage, pas l'administrateur
+                    'representant' => $demande->partenaire->est_interne ? config('kaarpro.parc.representant') : $demande->partenaire->user->nom,
+                    'telephone' => $demande->partenaire->est_interne ? config('kaarpro.parc.telephone') : $demande->partenaire->user->telephone,
                 ],
                 'vehicule' => [
                     'marque' => $vehicule->marque,
@@ -180,6 +181,6 @@ class DemandeController extends Controller
 
     private function verifierPartenaire(Request $request, Demande $demande): void
     {
-        abort_unless($demande->partenaire_id === $request->user()->partenaire->id, 404);
+        abort_unless($demande->partenaire_id === $this->partenaireCourant($request)->id, 404);
     }
 }

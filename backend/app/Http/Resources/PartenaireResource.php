@@ -14,6 +14,7 @@ class PartenaireResource extends JsonResource
             'id' => $this->id,
             'nom_commercial' => $this->nom_commercial,
             'type_activite' => $this->type_activite->value,
+            'est_interne' => $this->est_interne,
             'peut_vendre' => $this->type_activite->permetLaVente(),
             'peut_louer' => $this->type_activite->permetLaLocation(),
             'statut_validation' => $this->statut_validation->value,
