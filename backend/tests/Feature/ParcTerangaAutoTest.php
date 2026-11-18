@@ -7,6 +7,7 @@ use App\Enums\StatutValidation;
 use App\Enums\TypeActivite;
 use App\Models\Demande;
 use App\Models\Partenaire;
+use App\Models\Signalement;
 use App\Models\User;
 use App\Models\Vehicule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -129,6 +130,65 @@ class ParcTerangaAutoTest extends TestCase
             ->assertCreated()
             ->assertJsonPath('data.commission', 0)
             ->assertJsonPath('data.montant_partenaire', 90_000);
+
+        // Le contrat porte les coordonnées de TerangaAuto, pas celles de l'administrateur qui l'a accepté
+        $this->assertSame('Service commercial TerangaAuto', $contrat->donnees['partenaire']['representant']);
+        $this->assertSame(config('kaarpro.parc.telephone'), $contrat->donnees['partenaire']['telephone']);
+    }
+
+    public function test_le_compte_qui_porte_le_parc_ne_peut_pas_etre_desactive(): void
+    {
+        $proprietaire = $this->admin();
+        $autre = $this->admin();
+        $vehicule = Vehicule::factory()->create(['partenaire_id' => Partenaire::interne($proprietaire)->id]);
+        $this->assertTrue($proprietaire->estCompteDuParc());
+
+        // Ni depuis la page des utilisateurs…
+        $this->actingAs($autre)->patchJson("/api/admin/utilisateurs/{$proprietaire->id}/activation", ['est_actif' => false])
+            ->assertStatus(422)
+            ->assertJsonPath('message', fn ($m) => str_contains($m, 'parc TerangaAuto'));
+        // … ni à la suite d'un signalement
+        $client = User::factory()->create();
+        $this->actingAs($client)->postJson('/api/signalements', [
+            'utilisateur_id' => $proprietaire->id, 'motif' => 'comportement', 'description' => 'Test de signalement du parc.',
+        ])->assertCreated();
+        $signalement = Signalement::where('utilisateur_id', $proprietaire->id)->sole()->id;
+        $this->actingAs($autre)->postJson("/api/admin/signalements/{$signalement}/traiter", [
+            'statut' => 'traite', 'decision' => 'Essai', 'mesure' => 'desactiver_compte',
+        ])->assertStatus(422);
+        $this->assertTrue($proprietaire->refresh()->est_actif);
+        $this->getJson("/api/vehicules/{$vehicule->id}")->assertOk();
+
+        // Il reste un administrateur comme les autres dans la liste, et un autre administrateur peut être désactivé
+        $this->actingAs($autre)->getJson('/api/admin/utilisateurs')->assertOk()->assertJsonFragment(['email' => $proprietaire->email]);
+        $this->actingAs($proprietaire)->patchJson("/api/admin/utilisateurs/{$autre->id}/activation", ['est_actif' => false])->assertOk();
+        $this->getJson("/api/vehicules/{$vehicule->id}")->assertOk();
+    }
+
+    public function test_les_annonces_d_un_compte_desactive_disparaissent_du_catalogue(): void
+    {
+        $partenaire = Partenaire::factory()->valide()->create();
+        $vehicule = Vehicule::factory()->create(['partenaire_id' => $partenaire->id]);
+        $client = User::factory()->create();
+        $this->getJson('/api/vehicules')->assertJsonCount(1, 'data');
+
+        $this->actingAs($this->admin())->patchJson("/api/admin/utilisateurs/{$partenaire->user_id}/activation", ['est_actif' => false])->assertOk();
+
+        $this->getJson('/api/vehicules')->assertJsonCount(0, 'data');
+        $this->getJson("/api/vehicules/{$vehicule->id}")->assertNotFound();
+        $this->actingAs($client)->postJson("/api/vehicules/{$vehicule->id}/demandes", ['type' => 'achat'])->assertNotFound();
+    }
+
+    public function test_les_vehicules_de_demonstration_ont_leurs_documents(): void
+    {
+        $this->seed();
+
+        $vehicules = Vehicule::withCount('documents')->get();
+        $this->assertGreaterThanOrEqual(12, $vehicules->count());
+        $this->assertTrue($vehicules->every(fn ($v) => $v->documents_count === 2));
+        $this->assertSame(6, Vehicule::whereHas('partenaire', fn ($q) => $q->where('est_interne', true))->count());
+        Storage::disk('local')->assertExists($vehicules->first()->documents->first()->chemin);
+        $this->assertStringStartsWith('%PDF-', Storage::disk('local')->get($vehicules->first()->documents->first()->chemin));
     }
 
     public function test_tous_les_administrateurs_sont_notifies_et_partagent_les_messages_du_parc(): void
@@ -168,7 +228,7 @@ class ParcTerangaAutoTest extends TestCase
     public function test_l_espace_du_vendeur_reste_le_sien(): void
     {
         $admin = $this->admin();
-        Vehicule::factory()->create(['partenaire_id' => Partenaire::interne($admin)->id]);
+        Vehicule::factory()->create(['partenaire_id' => Partenaire::interne($this->admin())->id]);
         $partenaire = Partenaire::factory()->valide()->create(['type_activite' => TypeActivite::VenteEtLocation]);
 
         $this->actingAs($partenaire->user)->getJson('/api/partenaire/vehicules')->assertOk()->assertJsonCount(0, 'data');

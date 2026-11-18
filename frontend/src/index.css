@@ -45,6 +45,13 @@ a { color: var(--bleu); }
 .bouton-petit { padding: .4rem .8rem; font-size: .9rem; }
 .menu .bouton { color: var(--blanc); }
 .menu .bouton-discret { color: var(--bleu); }
+.menu-dense { gap: .5rem; }
+.menu-dense a { font-size: .875rem; }
+.menu-dense .bouton { padding: .4rem .75rem; font-size: .875rem; }
+.menu-dense .badge-role { font-size: .75rem; }
+/* En dessous de 1400 px, le badge « Administrateur » (redondant avec son menu) laisse la place aux liens */
+@media (max-width: 1399px) { .menu-dense .badge-role { display: none; } }
+@media (max-width: 1199px) { .menu-dense { gap: .4rem; } .menu-dense a, .menu-dense .bouton { font-size: .82rem; } }
 .lien { background: none; border: 0; color: var(--bleu); text-decoration: underline; cursor: pointer; font: inherit; padding: 0; text-align: left; }
 
 .hero { background: linear-gradient(135deg, var(--bleu), #2c4f8a); color: var(--blanc); border-radius: 18px; padding: 2.5rem 2rem; margin-bottom: 2rem; }
@@ -90,6 +97,11 @@ a { color: var(--bleu); }
 .onglet { border: 1px solid var(--bord); background: var(--blanc); border-radius: 99px; padding: .35rem .9rem; cursor: pointer; font: inherit; }
 .onglet-actif { background: var(--bleu); color: var(--blanc); border-color: var(--bleu); }
 .maitre-detail { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 1rem; align-items: start; }
+/* La liste des utilisateurs (nom, e-mail, rôle, statut, action) a besoin de plus de place que le formulaire */
+.maitre-detail-liste { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+.tableau-utilisateurs td:first-child { overflow-wrap: anywhere; }
+.tableau-utilisateurs td:last-child { white-space: nowrap; text-align: right; }
+.tableau-utilisateurs td:last-child .champ-aide { white-space: normal; display: inline-block; max-width: 7.5rem; line-height: 1.2; }
 .liste { display: flex; flex-direction: column; gap: .4rem; padding: .6rem; }
 .ligne { display: flex; flex-direction: column; text-align: left; gap: .1rem; border: 1px solid transparent; border-radius: 9px; background: none; padding: .6rem .7rem; cursor: pointer; font: inherit; }
 .ligne span { color: var(--gris); font-size: .88rem; }

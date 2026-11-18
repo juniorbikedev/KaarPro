@@ -140,8 +140,9 @@ class DemandeController extends Controller
                 ],
                 'partenaire' => [
                     'nom_commercial' => $demande->partenaire->nom_commercial,
-                    'representant' => $demande->partenaire->user->nom,
-                    'telephone' => $demande->partenaire->user->telephone,
+                    // Pour le parc de TerangaAuto, c'est l'entreprise qui s'engage, pas l'administrateur
+                    'representant' => $demande->partenaire->est_interne ? config('kaarpro.parc.representant') : $demande->partenaire->user->nom,
+                    'telephone' => $demande->partenaire->est_interne ? config('kaarpro.parc.telephone') : $demande->partenaire->user->telephone,
                 ],
                 'vehicule' => [
                     'marque' => $vehicule->marque,

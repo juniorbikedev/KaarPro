@@ -18,7 +18,8 @@ export default function Layout() {
           <span className="logo-icone" aria-hidden="true">K</span>
           Kaar<strong>Pro</strong>
         </Link>
-        <nav className="menu">
+        {/* Le menu de l'administrateur compte plus de liens : il est resserré pour tenir sur une ligne */}
+        <nav className={utilisateur?.role === 'admin' ? 'menu menu-dense' : 'menu'}>
           <NavLink to="/vehicules" end>Catalogue</NavLink>
           {utilisateur ? (
             <>

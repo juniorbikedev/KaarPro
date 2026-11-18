@@ -62,14 +62,12 @@ class Partenaire extends Model
         return $this->hasMany(Demande::class);
     }
 
-    /**
-     * Profil partenaire interne de TerangaAuto, sous lequel l'entreprise publie ses propres véhicules.
-     * Il est créé au premier accès d'un administrateur, validé d'office, et rattaché à son compte.
-     */
-    /** Personnes qui gèrent ce partenaire : son compte, ou tous les administrateurs pour le parc de TerangaAuto. */
+    /** Personnes qui gèrent ce partenaire : son compte, ou les administrateurs actifs pour le parc de TerangaAuto. */
     public function gestionnaires(): Collection
     {
-        return $this->est_interne ? User::where('role', Role::Admin)->get() : collect([$this->user]);
+        return $this->est_interne
+            ? User::where('role', Role::Admin)->where('est_actif', true)->get()
+            : collect([$this->user]);
     }
 
     /** Notifie le partenaire ; pour le parc, les liens de l'espace partenaire mènent à l'espace « Parc TerangaAuto ». */
@@ -82,11 +80,16 @@ class Partenaire extends Model
         Notification::send($this->gestionnaires(), $alerte);
     }
 
+    /**
+     * Profil partenaire interne de TerangaAuto, sous lequel l'entreprise publie ses propres véhicules.
+     * Il est créé au premier accès d'un administrateur, validé d'office et rattaché à son compte ; ce compte
+     * ne peut plus être désactivé tant qu'il porte le parc (voir estCompteDuParc).
+     */
     public static function interne(User $administrateur): self
     {
         return self::firstOrCreate(['est_interne' => true], [
             'user_id' => $administrateur->id,
-            'nom_commercial' => 'TerangaAuto',
+            'nom_commercial' => config('kaarpro.parc.nom_commercial'),
             'type_activite' => TypeActivite::VenteEtLocation,
             'statut_validation' => StatutValidation::Valide,
             'valide_le' => now(),

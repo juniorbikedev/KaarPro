@@ -85,7 +85,10 @@ class Vehicule extends Model
         return $requete
             ->where('statut_publication', self::PUBLIE)
             ->where('etat', '!=', EtatVehicule::Vendu)
-            ->whereHas('partenaire', fn ($q) => $q->where('statut_validation', StatutValidation::Valide));
+            // Partenaire validé dont le compte n'a pas été désactivé par un administrateur
+            ->whereHas('partenaire', fn ($q) => $q
+                ->where('statut_validation', StatutValidation::Valide)
+                ->whereHas('user', fn ($u) => $u->where('est_actif', true)));
     }
 
     /** Véhicules sans période d'indisponibilité qui chevauche [début, fin]. */

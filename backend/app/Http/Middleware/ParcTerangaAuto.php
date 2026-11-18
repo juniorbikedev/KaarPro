@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Espace « Parc TerangaAuto » de l'administrateur : les routes de l'espace partenaire y agissent sur le
- * profil partenaire interne de TerangaAuto (créé au premier accès).
+ * profil partenaire interne de TerangaAuto (créé au premier accès et rattaché au compte de l'administrateur).
  */
 class ParcTerangaAuto
 {

@@ -49,6 +49,7 @@ class UtilisateurController extends Controller
         $donnees = $request->validate(['est_actif' => ['required', 'boolean']]);
 
         abort_if($utilisateur->is($request->user()), 422, 'Vous ne pouvez pas désactiver votre propre compte.');
+        abort_if(! $donnees['est_actif'] && $utilisateur->estCompteDuParc(), 422, 'Ce compte porte le parc TerangaAuto : il ne peut pas être désactivé, sinon les véhicules du parc disparaîtraient du catalogue.');
 
         $utilisateur->update($donnees);
         if (! $utilisateur->est_actif) {
